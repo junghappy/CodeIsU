@@ -1,0 +1,18 @@
+package team.tttt.pms.emp.hntc.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import team.tttt.pms.emp.vo.HntcVO;
+
+@Mapper
+public interface HntcMapper {
+
+	public int hntcInsert(HntcVO hntcVo);
+	public List<HntcVO> selectHntc();
+	public HntcVO detailHntc(String boNo);
+	public int hntcDel(String boNo);
+	public int updateHntc(HntcVO hntcVO);
+
+}

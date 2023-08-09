@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.webapp.mapper.ProjectTaskMapper">
+
+<!-- 상위 업무 생성 -->
+<insert id="insertUpperTask" parameterType="taskVO">
+/* team.tttt.webapp.mapper.ProjectTaskMapper.insertUpperTask */
+insert into tb_task(
+	task_no
+	, task_title
+	, task_priority
+	, task_beng_dt
+	, task_ddln_dt
+	, task_reg_dt
+	, task_cn
+	, proj_no
+	, task_stts
+	, task_sttr
+) values(
+	#{taskNo}
+	, #{taskTitle}
+	, #{taskPriority}
+	, #{taskBengDt}
+	, #{taskDdlnDt}
+	, sysdate
+	, #{taskCn}
+	, #{projNo}
+	, #{taskStts}
+	, #{taskSttr}
+)
+</insert>
+
+<!-- 하위 업무 생성 -->
+<insert id="insertLowerTask" parameterType="taskVO">
+/* team.tttt.webapp.mapper.ProjectTaskMapper.insertLowerTask */
+
+insert into tb_task(
+	task_no
+	, task_title
+	, task_priority
+	, task_beng_dt
+	, task_ddln_dt
+	, task_reg_dt
+	, task_cn
+	, proj_no
+	, task_stts
+	, task_sttr
+	, upper_task
+) values(
+	#{taskNo}
+	, #{taskTitle}
+	, #{taskPriority}
+	, #{taskBengDt}
+	, #{taskDdlnDt}
+	, sysdate
+	, #{taskCn}
+	, #{projNo}
+	, #{taskStts}
+	, #{taskSttr}
+	, #{upperTask}
+)
+</insert>
+
+<!-- 업무 목록 조회 -->
+<select id="TaskList" parameterType="string" resultType="taskVO">
+/* team.tttt.webapp.mapper.ProjectTaskMapper.TaskList */
+
+select
+	TASK_NO
+	, TASK_TITLE
+	, TASK_PRIORITY
+	, TASK_BENG_DT
+	, TASK_DDLN_DT
+	, TASK_REG_DT
+	, TASK_CN
+	, PROJ_NO
+	, TASK_STTS
+	, UPPER_TASK
+	, TASK_STTR
+from
+	tb_task
+where
+	proj_no = 'a001'
+</select>
+
+
+<!-- 업무 상세조회 -->
+<select id="taskDetail" parameterType="string" resultType="taskVO">
+/* team.tttt.webapp.mapper.ProjectTaskMapper.TaskList */
+
+select
+	TASK_NO
+	, TASK_TITLE
+	, TASK_PRIORITY
+	, TASK_BENG_DT
+	, TASK_DDLN_DT
+	, TASK_REG_DT
+	, TASK_CN
+	, PROJ_NO
+	, TASK_STTS
+	, UPPER_TASK
+	, TASK_STTR
+from
+	tb_task
+where
+	task_no = #{taskNo}
+</select>
+
+
+<!-- 업무 삭제 -->
+<delete id="taskDelete" parameterType="string">
+/* team.tttt.webapp.mapper.ProjectTaskMapper.taskDelete */
+
+delete
+from
+	tb_task
+where
+	task_no = #{taskNo}
+</delete>
+
+
+<!-- 업무 업데이트 -->
+<update id="taskUpdate" parameterType="taskVO">
+/* team.tttt.webapp.mapper.ProjectTaskMapper.taskUpdate  */
+
+update
+	tb_task
+set
+	task_title = #{taskTitle}
+	, TASK_PRIORITY= #{taskPriority}
+	, TASK_BENG_DT =#{taskBengDt}
+	, TASK_DDLN_DT= #{taskDdlnDt}
+	, task_stts= #{taskStts}
+	, task_sttr= #{taskSttr}
+where task_no = #{taskNo} and proj_no = #{projNo}
+</update>
+
+
+</mapper>

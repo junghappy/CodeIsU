@@ -1,0 +1,43 @@
+package team.tttt.webapp.pms.service;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import team.tttt.webapp.common.enums.ServiceResult;
+import team.tttt.webapp.mapper.MemManagementMapper;
+import team.tttt.webapp.vo.MemJoinAplyVO;
+import team.tttt.webapp.vo.MemManagementVO;
+
+@Service
+public class MemManagementImpl implements IMemManagementService {
+
+	@Inject
+	private MemManagementMapper memMapper;
+
+	@Override
+	public List<MemManagementVO> memList(String projNo) {
+		return memMapper.memList(projNo);
+	}
+
+
+	@Override
+	public ServiceResult positionModify(String jbttlCd, String stuNo) {
+
+		int cnt = memMapper.positionModify(jbttlCd, stuNo);
+		if(cnt > 0){
+			return ServiceResult.OK;
+
+		}
+		return ServiceResult.FAILED;
+	}
+
+
+	@Override
+	public List<MemJoinAplyVO> memJoinAplyList(String projNo) {
+		return memMapper.memJoinAplyList(projNo);
+	}
+
+}

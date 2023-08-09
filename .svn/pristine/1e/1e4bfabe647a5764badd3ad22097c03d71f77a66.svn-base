@@ -1,0 +1,564 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%>
+<script src="${pageContext.request.contextPath}/common/sw/js/PmsProjectJs.js"></script>
+
+<style>
+  /* 헤더 텍스트 가운데 정렬 위함 */
+  .centered {
+    .ag-header-cell-label {
+      justify-content: center !important;
+    }
+  }
+  /* 그리드 헤더 색상 */
+  .ag-theme-alpine {
+    -ag-header-background-color: #484c7f;
+    -ag-header-foreground-color: #ffffff;
+  }
+
+  /* 그리드 내용 가운데 정렬 */
+  .ag-row .ag-cell {
+    display: flex;
+    justify-content: center;
+    /* align horizontal */
+    align-items: center;
+    /* align-content: center; */
+  }
+
+  .ag-header-cell-text {
+    margin-left: 40px;
+  }
+
+
+  .task {
+    background-color: #f4f2f2;
+  }
+  .taskCn {
+    background-color: #f4f2f2;
+  }
+
+  .msubBtn {
+    background-color: #56726a;
+    color: white;
+  }
+  .mcanBtn {
+    border: 1px solid gray;
+  }
+
+
+
+
+</style>
+
+<div id="wrapper">
+  <div
+    id="myGrid"
+    style="height: 600px; width: 100%"
+    class="ag-theme-alpine"
+  ></div>
+</div>
+
+<!-- insert Modal -->
+<div
+  class="modal fade"
+  id="taskInsertModal"
+  role="dialog"
+  aria-labelledby="taskInsertModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog d-flex justify-content-center" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-normal" id="taskInsertModalLabel">
+          일감 등록하기
+        </h5>
+      </div>
+
+      <div class="modal-body">
+        <form>
+          <label class="form-label mb-0" for="taskTitle">제목</label>
+          <input
+            type="text"
+            id="taskTitle"
+            name="taskTitle"
+            class="form-control task mb-1"
+          />
+
+          <label class="form-label mb-0" for="taskStts" class="ms-0">상태</label>
+          <select class="form-select task" id="taskStts" name="taskStts">
+            <option value="대기" selected>"대기"</option>
+            <option value="진행">진행</option>
+            <option value="완료">완료</option>
+            <option value="지연">지연</option>
+          </select>
+
+          <label class="form-label mb-0" for="taskPic">담당자</label>
+          <input
+            type="text"
+            name="taskPic"
+            id="taskPic"
+            class="form-control task mb-1"
+          />
+
+          <label class="form-label mb-0" for="taskBengDt">시작날짜</label>
+          <input
+            type="date"
+            name="taskBengDt"
+            id="taskBengDt"
+            class="form-control task mb-1"
+          />
+
+          <label class="forms-label" for="taskDdlnDt">종료날짜</label>
+          <input
+            type="date"
+            id="taskDdlnDt"
+            name="taskDdlnDt"
+            class="form-control task mb-1"
+          />
+
+          <label class="form-label mb-0" for="taskPriority">우선순위</label>
+          <select
+            class="form-select task"
+            id="taskPriority"
+            name="taskPriority"
+            aria-label="Default select example"
+          >
+            <option value="낮음" selected>낮음</option>
+            <option value="보통">보통</option>
+            <option value="긴급">긴급</option>
+          </select>
+
+          <label class="form-label mb-0" for="taskCn">내용</label>
+          <textarea
+            class="form-control task mb-1Cn"
+            id="taskCn"
+            name="taskCn"
+          ></textarea>
+
+          <div class="modal-footer">
+            <button type="button" class="btn bg msubBtn">등록</button>
+            <button
+              type="button"
+              class="btn bg mcanBtn"
+              data-bs-dismiss="modal"
+            >
+              닫기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- update modal -->
+<!-- insert Modal -->
+<div
+  class="modal fade"
+  id="taskUpdateModal"
+  role="dialog"
+  aria-labelledby="taskInsertModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog d-flex justify-content-center" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-normal" id="taskInsertModalLabel">
+          일감 수정
+        </h5>
+      </div>
+
+      <div class="modal-body">
+        <form>
+          <label class="form-label mb-0" for="taskUpdateTitle">제목</label>
+          <input
+            type="text"
+            id="taskUpdateTitle"
+            name="taskTitle"
+            class="form-control task mb-1"
+          />
+
+          <label class="form-label mb-0" for="taskUpdateStts" class="ms-0"
+            >상태</label
+          >
+          <select class="form-select task" id="taskUpdateStts" name="taskStts">
+            <option value="대기" selected>대기</option>
+            <option value="진행">진행</option>
+            <option value="완료">완료</option>
+            <option value="지연">지연</option>
+          </select>
+
+          <label class="form-label mb-0" for="taskUpdatePic">담당자</label>
+          <input
+            type="text"
+            name="taskPic"
+            id="taskUpdatePic"
+            class="form-control task mb-1"
+          />
+
+          <label class="form-label mb-0" for="taskUpdateBengDt">시작날짜</label>
+          <input
+            type="date"
+            name="taskBengDt"
+            id="taskUpdateBengDt"
+            class="form-control task mb-1"
+          />
+
+          <label class="forms-label" for="taskUpdateDdlnDt">종료날짜</label>
+          <input
+            type="date"
+            id="taskUpdateDdlnDt"
+            name="taskDdlnDt"
+            class="form-control task mb-1"
+          />
+
+          <label class="form-label mb-0" for="taskUpdatePriority">우선순위</label>
+          <select
+            class="form-select task"
+            id="taskUpdatePriority"
+            name="taskPriority"
+            aria-label="Default select example"
+          >
+            <option value="낮음" selected>낮음</option>
+            <option value="보통">보통</option>
+            <option value="긴급">긴급</option>
+          </select>
+
+          <label class="form-label mb-0" for="taskUpdateCn">내용</label>
+          <textarea
+            class="form-control task mb-1Cn"
+            id="taskUpdateCn"
+            name="taskCn"
+          ></textarea>
+
+          <div class="modal-footer">
+            <button type="button" id="UpdateBtn" class="btn bg msubBtn">
+              수정
+            </button>
+            <button
+              type="button"
+              class="btn bg mcanBtn"
+              data-bs-dismiss="modal"
+            >
+              닫기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 상세보기 모달-->
+
+<!-- insert Modal -->
+<div
+  class="modal fade"
+  id="taskDetailModal"
+  role="dialog"
+  aria-labelledby="taskDetailModal"
+  aria-hidden="true"
+>
+  <div class="modal-dialog d-flex justify-content-center" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-normal" id="taskDetailModalLabel">
+          일감 상세보기
+        </h5>
+      </div>
+
+      <div class="modal-body">
+        <form>
+          <label class="form-label mb-0" for="taskDetailTitle">제목</label>
+          <input
+            type="text"
+            id="taskDetailTitle"
+            name="taskTitle"
+            class="form-control task mb-1" readonly="readonly"
+          />
+
+          <label class="form-label mb-0" for="taskDetailtaskNo">업무번호</label>
+          <input
+            type="text"
+            id="taskDetailtaskNo"
+            name="taskNo"
+            class="form-control task mb-1" readonly="readonly"
+          />
+
+          <label class="form-label mb-0" for="taskDetailStts" class="ms-0"
+            >상태</label
+          >
+          <input
+          class="form-control task mb-1"
+            id="taskDetailStts"
+            name="taskStts" readonly="readonly"
+          ></input>
+
+          <label class="form-label mb-0" for="taskDetailPic">담당자</label>
+          <input
+            type="text"
+            name="taskPic"
+            id="taskDetailPic"
+            class="form-control task mb-1" readonly="readonly"
+          />
+
+          <label class="form-label mb-0" for="taskDetailSttr">진척도</label>
+          <div class="progress">
+            <div class="progress-bar bg-warning" id="taskDetailSttr" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+          </div>
+
+          <label class="form-label mb-0" for="taskDetailRegDt">등록일</label>
+          <input
+            type="date"
+            name="taskRegDt"
+            id="taskDetailRegDt"
+            class="form-control task mb-1" readonly="readonly"
+          />
+
+          <label class="form-label mb-0" for="taskDetailBengDt">시작날짜</label>
+          <input
+            type="date"
+            name="taskBengDt"
+            id="taskDetailBengDt"
+            class="form-control task mb-1" readonly="readonly"
+          />
+
+          <label class="forms-label" for="taskDetailDdlnDt">종료날짜</label>
+          <input
+            type="date"
+            id="taskDetailDdlnDt"
+            name="taskDdlnDt"
+            class="form-control task mb-1" readonly="readonly"
+          />
+
+          <label class="form-label mb-0" for="taskDetailPriority">우선순위</label>
+          <input
+           class="form-control task mb-1"
+            id="taskDetailPriority"
+            name="taskPriority"
+            aria-label="Default select example" readonly="readonly"
+          />
+
+          <label class="form-label mb-0" for="taskDetailCn">내용</label>
+          <textarea
+            class="form-control task mb-1 Cn"
+            id="taskDetailCn"
+            name="taskCn" readonly="readonly"
+          ></textarea>
+
+          <div class="modal-footer">
+            <button type="button" class="btn bg msubBtn">수정</button>
+            <button type="button" id="deleteTaskBtn" class="btn bg msubBtn">삭제</button>
+            <button
+              type="button"
+              class="btn bg mcanBtn"
+              data-bs-dismiss="modal"
+            >
+              닫기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+<script>
+  var projNo = "a001";
+
+  const columnDefs = [
+    {
+      field: "taskNo",
+      headerName: "업무번호",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskTitle",
+      headerName: "업무명",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskStts",
+      headerName: "상태",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskPriority",
+      headerName: "우선순위",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskBengDt",
+      headerName: "시작일",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskDdlnDt",
+      headerName: "마감일",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskRegDt",
+      headerName: "등록일",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskSttr",
+      headerName: "전척도",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "upperTask",
+      headerName: "상위 업무번호",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "userNms",
+      headerName: "담당자",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+  ];
+
+  const rowData = [];
+
+  function getData(projNo) {
+    $.ajax({
+      url: "/pms/project/taskListOut?${_csrf.parameterName}=${_csrf.token}",
+      data: {
+        projNo: projNo,
+      },
+      type: "POST",
+      dataType: "json",
+      success: function (res) {
+        console.log("넘어온 데이터", res);
+
+        const updatedRes = res.map((data) => {
+          const userNms = data.asgList.map((item) => item.userNm);
+          return { ...data, userNms };
+        });
+
+        gridOptions.api.setRowData(updatedRes);
+      },
+      error: function (xhr, status, error) {
+        console.error(error);
+      },
+    });
+  }
+
+  const gridOptions = {
+    columnDefs: columnDefs,
+    rowData: rowData,
+    rowSelection: "multiple",
+    animateRows: true,
+
+    onCellClicked: (params) => {
+      console.log("등록한 데이터 tr", params);
+
+      detailTask(params.data.taskNo);
+    },
+  };
+
+  function detailTask(taskNo) {
+    $.ajax({
+      url: "/pms/project/taskDetail",
+      data: {
+    	  taskNo: taskNo,
+      },
+      type: "get",
+      dataType: "json",
+      success: function (res) {
+        console.log(res)
+
+        $("#taskDetailCn").val(res.taskCn);
+
+        $("#taskDetailtaskNo").val(res.taskNo);
+        $("#taskDetailPriority").val(res.taskPriority);
+
+        $("#taskDetailRegDt").val(res.taskRegDt);
+
+
+        $("#taskDetailBengDt").val(convertDate(res.taskBengDt));
+
+
+        $("#taskDetailDdlnDt").val(convertDate(res.taskDdlnDt));
+
+
+
+        var progressBar = $("#taskDetailSttr");
+        progressBar.css("width", res.taskSttr + "%");
+
+        $("#taskDetailStts").val(res.taskStts);
+        $("#taskDetailTitle").val(res.taskTitle);
+        $("#taskDetailUpperTask").val(res.upperTask);
+
+        const asgList = res.asgList;
+        console.log(asgList);
+
+        let taskPics = "";
+
+        for(let i=0; i< asgList.length; i++){
+          taskPics += asgList[i].userNm + " ";
+        }
+
+        $("#taskDetailPic").val(taskPics);
+
+        $("#taskDetailModal").modal("show");
+
+      },
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const gridDiv = document.querySelector("#myGrid");
+    new agGrid.Grid(gridDiv, gridOptions);
+    getData(projNo);
+  });
+
+  const deleteBtn = document.querySelector("#deleteTaskBtn");
+  deleteBtn.addEventListener("click", deleteTask);
+
+  function deleteTask(){
+	  var result = confirm("삭제하시겠습니까?");
+
+	  if(result){
+
+      $.ajax({
+        url:"/pms/project/taskDelete"
+      })
+
+	      alert("삭제되었습니다.");
+	  }else{
+	      return;
+	  }
+  }
+
+
+  const cdTypeId = "P003";
+
+  function getCode() {
+    $.ajax({
+      url: "/cmCd/selectCode",
+      data: {
+        cdTypeId: cdTypeId,
+      },
+      type: "get",
+      dataType: "json",
+      success: function (res) {
+        console.log(res);
+      },
+    });
+  }
+
+  //getCode();
+
+</script>

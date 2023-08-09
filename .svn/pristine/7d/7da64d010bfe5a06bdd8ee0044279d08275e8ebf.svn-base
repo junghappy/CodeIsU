@@ -1,0 +1,25 @@
+package team.tttt.pms.project.alarm.service.impl;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import team.tttt.pms.project.alarm.mapper.AlarmMapper;
+import team.tttt.pms.project.alarm.service.AlarmService;
+import team.tttt.pms.project.vo.AlarmVO;
+
+@Service
+public class AlarmServiceImpl implements AlarmService{
+
+	@Inject
+	private AlarmMapper mapper;
+
+	@Override
+	public void saveAlarm(AlarmVO aVO) {
+		mapper.saveAlarm(aVO);
+	}
+
+
+
+
+}

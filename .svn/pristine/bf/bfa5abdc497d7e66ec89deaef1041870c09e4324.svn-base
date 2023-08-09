@@ -1,0 +1,587 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%>
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script> -->
+<script src="${pageContext.request.contextPath}/common/sw/js/PmsProjectJs.js"></script>
+<script src="${pageContext.request.contextPath}/common/sw/js/PmsDashBoardJs.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.bundle.js"></script>
+
+<style></style>
+
+<div class="card mt-3 mb-3">
+  <div class="row mb-2">
+    <div class="col-md-4">
+      <div>
+        <div class="card-body">
+          <div class="row">프로젝트 명</div>
+          <div class="row">
+            <div class="col-md-5">참여인원수</div>
+            <div class="col-md-3">5명</div>
+            <div class="col-md-4">내용</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div>
+        <div class="card-body">
+          <div class="row">프로젝트 이름</div>
+          <div class="row">프로젝트 설명</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col">직책</div>
+            <div class="col">본인직책</div>
+          </div>
+          <div class="row">
+            <div class="col">기간</div>
+            <div class="col">2222-2222</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-2 row-deck">
+  <div class="col-md-12 col-lg-4 col-xl-4 col-xxl-4">
+    <div class="card">
+      <div class="card-body" id="projectSttr">1</div>
+    </div>
+  </div>
+
+  <div class="col-md-12 col-lg-4 col-xl-4 col-xxl-4">
+    <div class="card">
+      <div class="card-body" id="projectWork"></div>
+    </div>
+  </div>
+  <div class="col-md-12 col-lg-4 col-xl-4 col-xxl-4">
+    <div class="card">
+      <div class="card-body" id="projectIssue">
+        3
+        <div>
+          <div>진행상태</div>
+        </div>
+        <div>
+          <div>차트자리</div>
+        </div>
+        <div>남은일</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-2 row-deck">
+  <div class="col-md-12 col-lg-4 col-xl-4 col-xxl-4">
+    <div class="card">
+      <div class="table-responsive">
+        <table class="table align-items-center mb-0">
+          <thead>
+            <tr>
+              <th
+                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+              >
+                이름
+              </th>
+              <th
+                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2"
+              >
+                직책
+              </th>
+              <th
+                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2"
+              >
+                상세보기
+              </th>
+            </tr>
+          </thead>
+          <tbody id="projectMemberList"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12 col-lg-4 col-xl-4 col-xxl-4">
+    <div class="card">
+      <div class="table-responsive">
+        <table class="table align-items-center mb-0">
+          <thead>
+            <tr>
+              <th
+                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+              >
+                담당자
+              </th>
+              <th
+                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2"
+              >
+                일감 진행도
+              </th>
+            </tr>
+          </thead>
+          <tbody id="projectTaskProgress"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12 col-lg-4 col-xl-4 col-xxl-4">
+    <div class="card">
+      <div class="card-body">
+        <div id="sttrStatistics"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let projNo = "${projNo}";
+  let ctxProject;
+
+  console.log("projNo : : ", projNo);
+
+  charPluginSettings();
+
+  const projectChart = (data, backgroundColor, labels, text) => {
+    var myChart = new Chart(ctxProject, {
+      type: "doughnut",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            data: data,
+            backgroundColor: backgroundColor,
+            borderColor: "white",
+            borderWidth: 0,
+            scaleBeginAtZero: true,
+            hoverOffset: 6,
+          },
+        ],
+      },
+      options: {
+        responsive: false,
+        legend: {
+          labels: {
+            boxWidth: 20,
+          },
+        },
+        elements: {
+          center: {
+            text: text,
+            color: "black", // Default is #000000
+            fontStyle: "Arial", // Default is Arial
+            sidePadding: 20, // Default is 20 (as a percentage)
+            minFontSize: 15, // Default is 20 (in px), set to false and text will not wrap.
+            lineHeight: 25, // Default is 25 (in px), used for when text wraps
+          },
+        },
+      },
+    });
+  };
+
+  const getProjectInfo = (projNo) => {
+    $.ajax({
+      url: "/pms/project/projectInfo",
+      data: {
+        projNo: projNo,
+      },
+      type: "get",
+      dataType: "json",
+      success: function (res) {
+        console.log("프로젝트 정보", res);
+        let projBgngDt = res.projBgngDt;
+        let projDdlnDt = res.projDdlnDt;
+
+        let sys = new Date();
+
+        let lestDay = Date.parse(projDdlnDt) - sys;
+
+        let daysLeft =
+          Math.ceil(lestDay / (1000 * 60 * 60 * 24)) + " days left";
+
+        str = `
+        <div>
+            <div class="itemHeader" id="projectHeader">
+
+            </div>
+        </div>
+        <hr style="border: solid 1px black;">
+        <div>
+          <div>
+            <div id="projectChartInner">
+            </div>
+            <canvas  id="projectChart"  width="309" height="190" style="width: 250px; height: 250px;">
+            </canvas>
+          </div>
+        </div>
+        <div>
+          \${daysLeft}
+        </div>
+
+
+      `;
+
+        // 차트 js 데이터 셋
+        projSttr = [];
+        lestStrr = 100 - res.projSttr;
+        projSttr.push(res.projSttr);
+        projSttr.push(lestStrr);
+
+        backgroundColor = [];
+        backgroundColor.push("#56726A");
+        backgroundColor.push("#F2F3F6");
+
+        labels = [];
+        labels.push("진행", "미진행");
+        // 데이터 셋 추가 완료
+
+        text = "진행도\n" + res.projSttr + "%";
+        console.log("project text : ", text);
+
+        $("#projectSttr").html(str);
+        $("#projectHeader").html("상태" + res.projSttsCd);
+
+        ctxProject = document.getElementById("projectChart").getContext("2d");
+
+        projectChart(projSttr, backgroundColor, labels, text);
+      },
+      error: function (xhr) {
+        console.log("getProjectInfo 상태: " + xhr.status);
+      },
+    });
+  };
+
+  getProjectInfo(projNo);
+
+  const getProjectTaskInfo = (projNo) => {
+    $.ajax({
+      url: "/pms/project/ProjectTaskInfo",
+      data: {
+        projNo: projNo,
+      },
+      type: "get",
+      dataType: "json",
+      success: function (res) {
+        console.log("일감 정보", res);
+
+        let complete = 0;
+        let wait = 0;
+        let progress = 0;
+        let postpone = 0;
+
+        let completeColor = "#E9D6C6";
+
+        let waitColor = "#465B8A";
+
+        let progressColor = "#56726A";
+
+        let postponeColor = "#AA6062";
+
+        for (let i = 0; i < res.length; i++) {
+          if (res[i].taskStts == "완료") {
+            complete++;
+          } else if (res[i].taskStts != "완료" && res[i].taskStts == "대기") {
+            wait++;
+          } else if (res[i].taskStts != "완료" && res[i].taskStts == "진행") {
+            progress++;
+          } else if (res[i].taskStts != "완료" && res[i].taskStts == "지연") {
+            postpone++;
+          }
+        }
+
+        str = `
+        <div>
+
+            <div class="itemHeader" id="taskHeader">
+
+            </div>
+        </div>
+        <hr style="border: solid 1px black;">
+        <div>
+          <div>
+            <div id="projectTaskChartInner">
+            </div>
+            <canvas id="projectTaskChart" width="309" height="190" style="width: 250px; height: 250px;"></canvas>
+
+          </div>
+        </div>
+
+        <div>
+        	하단에 넣을것
+        </div>
+
+
+      `;
+
+        // 차트 js 데이터 셋
+        projTaskSttr = [];
+        projTaskSttr.push(complete, wait, progress, postpone);
+
+        backgroundColor = [];
+        backgroundColor.push(
+          completeColor,
+          waitColor,
+          progressColor,
+          postponeColor
+        );
+
+        labels = [];
+        labels.push("완료", "대기", "진행", "지연");
+
+        // 데이터 셋 추가 완료
+
+        let allStts = complete + wait + progress + postpone;
+        let taskStts = (complete / allStts) * 100;
+
+        taskStts = Math.floor(taskStts);
+
+        console.log("taskStts : ", taskStts);
+
+        text = "진행도\n" + taskStts + "%";
+
+        let headerText = "일감상태  " + complete + "/" + allStts;
+
+        $("#projectWork").html(str);
+        $("#taskHeader").html(headerText);
+
+        ctxProject = document
+          .getElementById("projectTaskChart")
+          .getContext("2d");
+
+        projectChart(projTaskSttr, backgroundColor, labels, text);
+      },
+      error: function (xhr) {
+        console.log("getProjectInfo 상태: " + xhr.status);
+      },
+    });
+  };
+
+  getProjectTaskInfo(projNo);
+
+  const getProjectIssueInfo = (projNo) => {
+    $.ajax({
+      url: "/pms/project/getIssue",
+      data: {
+        projNo: projNo,
+      },
+      type: "get",
+      dataType: "json",
+      success: function (res) {
+        console.log("이슈 정보", res);
+
+        let complete = 0;
+        let defect = 0;
+        let modify = 0;
+
+        let completeColor = "#E9D6C6";
+
+        let modifyColor = "#56726A";
+
+        let defectColor = "#AA6062";
+
+        for (let i = 0; i < res.length; i++) {
+          if (res[i].issueSttsCd == "완료") {
+            complete++;
+          } else if (
+            res[i].issueSttsCd != "완료" &&
+            res[i].issueSttsCd == "결함"
+          ) {
+            defect++;
+          } else if (
+            res[i].issueSttsCd != "완료" &&
+            res[i].issueSttsCd == "수정"
+          ) {
+            modify++;
+          }
+        }
+
+        str = `
+        <div>
+
+            <div class="itemHeader" id="issueHeader">
+
+            </div>
+        </div>
+        <hr style="border: solid 1px black;">
+        <div>
+          <div>
+            <div id="projectIssueChartInner">
+            </div>
+            <canvas id="projectIssueChart" width="309" height="190" style="width: 250px; height: 250px;">
+            </canvas>
+          </div>
+        </div>
+
+        <div>
+        	하단에 넣을것
+        </div>
+
+
+      `;
+
+        // 차트 js 데이터 셋
+        projTaskSttr = [];
+        projTaskSttr.push(complete, modify, defect);
+
+        backgroundColor = [];
+        backgroundColor.push(completeColor, defectColor, modifyColor);
+
+        labels = [];
+        labels.push("완료", "수정", "결함");
+
+        // 데이터 셋 추가 완료
+
+        let allSttr = complete + defect + modify;
+        let issueSttr = (complete / allSttr) * 100;
+
+        issueSttr = Math.floor(issueSttr);
+
+        console.log("taskStts : ", issueSttr);
+
+        text = "진행도\n" + issueSttr + "%";
+
+        let headerText = "이슈상태  " + complete + "/" + allSttr;
+
+        $("#projectIssue").html(str);
+        $("#issueHeader").html(headerText);
+
+        ctxProject = document
+          .getElementById("projectIssueChart")
+          .getContext("2d");
+
+        projectChart(projTaskSttr, backgroundColor, labels, text);
+      },
+      error: function (xhr) {
+        console.log("getProjectInfo 상태: " + xhr.status);
+      },
+    });
+  };
+
+  getProjectIssueInfo(projNo);
+
+  const ProjectMemberInfo = (projNo) => {
+    $.ajax({
+      url: "/pms/project/ProjectMemberInfo",
+      data: {
+        projNo: projNo,
+      },
+      type: "get",
+      dataType: "json",
+      success: function (res) {
+        console.log("ProjectMemberInfo", res);
+        let MemberInfo = "";
+
+        for (let i = 0; i < res.length; i++) {
+          MemberInfo += `
+            <tr>
+                    <td>
+                      <div class="d-flex px-2">
+                        <div>
+                          <img src="https://i.namu.wiki/i/U9XjzBKZaxeTkElVFZ7EteaNxN9x3ZpacnHWUSiBqZs-3fgXyRv2slAb4MoA-brxiORjxHhH9g6c_x6HZdYTqg.webp" class="avatar avatar-sm rounded-circle me-2">
+                        </div>
+                        <div class="my-auto">
+                          <h6 class="mb-0 text-xs" id="proMem">\${res[i].userNm}</h6>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-normal mb-0" id="projbttl">\${res[i].jbttlCd}</p>
+                    </td>
+
+                    <td class="align-middle">
+                      <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
+                        <span class="material-icons">
+                        more_vert
+                        </span>
+                      </button>
+                    </td>
+                  </tr>
+            `;
+        }
+
+        $("#projectMemberList").html(MemberInfo);
+      },
+    });
+  };
+
+  ProjectMemberInfo(projNo);
+
+  const proMemProgress = (projNo) => {
+    $.ajax({
+      url: "/pms/project/proMemProgress",
+      data: {
+        projNo: projNo,
+      },
+      type: "get",
+      dataType: "json",
+      success: function (res) {
+        console.log("proMemProgress", res);
+
+        let projectTaskProgress = "";
+
+        for (let i = 0; i < res.length; i++) {
+          total = res[i].complete + res[i].progress;
+          console.log("total : ", total);
+
+          let sttr = (res[i].complete / total) * 100;
+          console.log("sttr : ", sttr);
+
+          sttr = Math.ceil(sttr);
+
+          console.log(sttr);
+
+          projectTaskProgress += `
+            <tr>
+                    <td>
+                        <div class="my-auto">
+                          <h6 class="mb-0 text-xs">\${res[i].userNm}</h6>
+                      </div>
+                    </td>
+
+                    <td>
+
+                     <div>
+
+                       <div class="progress-wrapper" id="taskDetailSttrDiv">
+                           <div class="progress-info">
+                             <div class="progress-percentage" style="text-align:right">
+                               <span class="text-sm font-weight-normal" id="taskDetailSttr">\${sttr}%</span>
+                             </div>
+                           </div>
+                           <div class="progress w-100">
+                             <div class="progress-bar bg-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: \${sttr}%;">
+                             </div>
+                           </div>
+                       </div>
+                     	 <div>
+                    </td>
+
+                  </tr>
+            `;
+        }
+
+        $("#projectTaskProgress").html(projectTaskProgress);
+      },
+    });
+  };
+
+  proMemProgress(projNo);
+
+  const proStatics = (projNo) => {
+    $.ajax({
+      url: "/pms/project/proMemProgress",
+      data: {
+        projNo: projNo,
+      },
+      type: "get",
+      dataType: "json",
+      success: function (res) {
+        console.log(res);
+        //$("#sttrStatistics").html(res);
+      },
+    });
+  };
+</script>

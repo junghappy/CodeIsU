@@ -1,0 +1,66 @@
+package team.tttt.webapp.pms.web;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import team.tttt.webapp.common.enums.ServiceResult;
+import team.tttt.webapp.pms.service.IMemManagementService;
+import team.tttt.webapp.vo.MemJoinAplyVO;
+import team.tttt.webapp.vo.MemManagementVO;
+
+@Controller
+@RequestMapping("/pms")
+public class PmsMemManagementController {
+
+	@Inject
+	private IMemManagementService memService;
+
+	@RequestMapping(value="/memlist.do")
+	public String memberManagementList(Model model) {
+		return "pms/com/memManagement";
+	}
+
+
+	@ResponseBody
+	@RequestMapping(value="/mem.do")
+	public List<MemManagementVO> memList(@RequestBody String projNo) {
+		List<MemManagementVO> memList = memService.memList(projNo);
+		return memList;
+	}
+
+	@ResponseBody
+	@RequestMapping(value="/memupdate.do")
+	public String positionModify(@RequestParam("jbttlCd") String jbttlCd, @RequestParam("stuNo") String stuNo) {
+
+	    String goPage = "";
+	    System.out.println(jbttlCd+"        ------------------"+ stuNo);
+
+	    ServiceResult result = memService.positionModify(jbttlCd, stuNo);
+
+	    if (result.equals(ServiceResult.OK)) {
+	        goPage = "success";
+	    } else {
+	        goPage = "실패";
+	    }
+	    return goPage;
+	}
+
+
+
+	@ResponseBody
+	@RequestMapping(value="/memJoinAply.do")
+	public List<MemJoinAplyVO> memJoinAplyList(@RequestBody String projNo) {
+		List<MemJoinAplyVO> memJoinList = memService.memJoinAplyList(projNo);
+		return memJoinList;
+	}
+
+
+}

@@ -1,0 +1,325 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%>
+<script src="${pageContext.request.contextPath}/common/sw/js/PmsProjectJs.js"></script>
+<script src="${pageContext.request.contextPath}/common/sw/js/CommonCode.js"></script>
+<c:set var="projNo" value="${projNo}" />
+<c:set var="userNo" value="${userNo}" />
+<c:set var="userVo" value="${userVo}" />
+<style>
+/*   /* 헤더 텍스트 가운데 정렬 */
+  .centered {
+    .ag-header-cell-label {
+      justify-content: center !important;
+    }
+  }
+  /* 그리드 헤더 색상 */
+  .ag-theme-alpine {
+    -ag-header-background-color: black;
+  }
+
+  /* 그리드 내용 가운데 정렬 */
+  .ag-row .ag-cell {
+    display: flex;
+    justify-content: center;
+    /* align horizontal */
+    align-items: center;
+    /* align-content: center; */
+  }
+ */
+  .ag-header-cell-text {
+    margin-left: 40px;
+  }
+
+   .task {
+    background-color: #f4f2f2;
+  }
+  .taskCn {
+    background-color: #f4f2f2;
+  }
+
+  .msubBtn {
+    background-color: #56726a;
+    color: white;
+  }
+
+
+.controllProgress {
+  display: flex;
+  align-items: center;
+}
+
+.controllInput {
+  flex: 1;
+}
+
+#progressPer {
+  margin-left: 10px;
+}
+
+.textline {
+	border: 1px solid #e5e5e5;
+}
+
+.btn{
+	margin-bottom : 0 !important;
+	--bs-btn-padding-x: 1.0rem !important;
+    --bs-btn-padding-y: 0.4rem !important;
+}
+
+.search{
+	background: white;
+}
+
+</style>
+
+<link
+  rel="stylesheet"
+  href="${pageContext.request.contextPath}/common/sw/css/PmsProjectCss.css"
+/>
+
+
+
+
+
+
+  <div class="row mt-3 mb-3">
+  	  <div class="col-11">
+	  	<input type="text" class="form-control search" oninput="onQuickFilterChanged()" id="searchFilter" placeholder="Search" />
+  	  </div>
+  	  <div class="col ps-0">
+  	  	      <button type="button" id="insertTaskBtn" class="btn bg msubBtn">
+		        	일감 추가 <i class="icofont-plus-circle me-2 fs-6"></i>
+		      </button>
+  	  </div>
+  </div>
+  <div class="row">
+	  <div id="myGrid" style="height: 500px; width: 100%" class="ag-theme-alpine"></div>
+  </div>
+
+<!--모달-->
+<div
+  class="modal fade"
+  id="taskModal"
+  role="dialog"
+  aria-labelledby="taskModal"
+  aria-hidden="true"
+>
+  <div class="modal-dialog d-flex justify-content-center" role="document">
+    <div class="modal-content" id="taskModalBody"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+<script>
+  const projNo = "${projNo}";
+  const userNm = "${userNm}";
+
+  /*  웹소켓 설정 && 이슈 등록 알림  */
+  let webSocket = null;
+
+  function connect() {
+    webSocket = new WebSocket("ws://localhost:80/tttt"); // End Point
+    //이벤트에 이벤트핸들러 뜽록
+    webSocket.onopen = fOpen; // 소켓 접속되면 짜똥 실행할 함수(fOpen)
+    webSocket.onmessage = fMessage; // 써버에서 메쎄징 오면  짜똥 실행할 함수(fMessage)
+  }
+  // 연결이 열리면 자동실행(딱 한번)
+  function fOpen() {
+    console.log("웹소켓 연결 썽꽁");
+  }
+
+  // 민정이가 데이타 보내고 싶을 때 사용 , handleTextMessage로 전송
+  function sendMsg(msg) {
+    // 써버로 메쎄찡 떤쏭하는 함수
+    if (!msg) {
+      webSocket.send("연결성공");
+      return;
+    }
+    webSocket.send(msg);
+    console.log("msg : ", msg);
+  }
+
+  //알림 메세지 띄우기
+  function alarmMsg(data){
+
+		const msg = data.split(",")[0];
+		const uNm = data.split(",")[2];  //학생 이름 가져오기
+	    const bell = $(".fa-bell");
+	      bell.addClass("fas fa-bell");
+	      bell.append(
+	       	"<div class='icon' style='width: 8px;height: 8px;background: #f30000;border-radius: 100%;position: absolute;right: 21%;top: 28%;'></div>"
+	      );
+
+	    $(".dropdown-menu").prepend(uNm+"님이 새로운 "+msg+"을 등록했습니다."); //요소 맨위에 추가
+	    console.log(uNm+"님이 새로운 "+msg+"을 등록했습니다.", data);
+
+  }
+
+
+  // 서버에서 데이터가 왔을때 자동실행
+  function fMessage() {
+
+    let data = event.data; // 서버가 보낸 데이터가 event.data에 담겨있음!
+
+    console.log("let data : ", data);
+	var pNo = data.split(",")[1];  //프로젝트 번호 가져오기
+	if(pNo == `\${projNo}`){   //해당 프로젝트에만 알림 메세지 보내기
+		alarmMsg(data);
+	}
+	console.log("pNo : ", pNo)
+  }
+
+  // 웹소켓 연결
+  connect();
+
+
+
+
+  //서버에서 발행된 헤더네임과 토큰갑사 저장
+  var header = "${_csrf.headerName}";
+  var token = "${_csrf.token}";
+
+  //바닐라 자바스크립트 사용시 AJAX send 전에 헤더값 세팅 필요
+  //xhr.setRequestHeader(header, token);
+
+  function onQuickFilterChanged() {
+    gridOptions.api.setQuickFilter(document.querySelector('#searchFilter').value);
+	}
+
+  const columnDefs = [
+    {
+      field: "taskTitle",
+      headerName: "업무명",
+      maxWidth: 150,
+    },
+    {
+      field: "taskStts",
+      headerName: "상태",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 150,
+    },
+    {
+      field: "taskPriority",
+      headerName: "우선순위",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 150,
+    },
+    {
+      field: "taskBengDt",
+      headerName: "시작일",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 150,
+    },
+    {
+      field: "taskDdlnDt",
+      headerName: "마감일",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 150,
+    },
+    {
+      field: "taskSttr",
+      headerName: "전척도",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 150,
+    },
+    {
+      field: "userNms",
+      headerName: "담당자",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 160,
+    },
+  ];
+
+  const rowData = [];
+
+  function getData(projNo) {
+    $.ajax({
+      url: "/pms/project/taskListOut?${_csrf.parameterName}=${_csrf.token}",
+      data: {
+        projNo: projNo,
+      },
+      type: "POST",
+      dataType: "json",
+      success: function (res) {
+        console.log("넘어온 데이터", res);
+
+        for(let i=0; i<res.length; i++){
+            res[i].taskSttr = res[i].taskSttr+'%';
+        }
+
+        const updatedRes = res.map((data) => {
+          const userNms = data.asgList.map((item) => item.userNm);
+          return { ...data, userNms };
+        });
+
+        gridOptions.api.setRowData(updatedRes);
+      },
+      error: function (xhr, status, error) {
+        console.error(error);
+      },
+    });
+  }
+
+  const gridOptions = {
+  	defaultColDef: {
+	    enableRowGroup: true,
+	    enablePivot: true,
+	    enableValue: true,
+	    sortable: true,
+	    resizable: true,
+	    filter: true,
+	    minWidth: 100,
+	},
+	suppressRowClickSelection: true,
+	groupSelectsChildren: true,
+    columnDefs: columnDefs,
+    rowData: rowData,
+    rowSelection: "multiple",
+    rowGroupPanelShow: 'always',
+    pivotPanelShow: 'always',
+    animateRows: true,
+    pagination: true,
+    paginationPageSize: 10,
+    onCellClicked: (params) => {
+      console.log("등록한 데이터 tr", params);
+
+      detailTask(params.data.taskNo);
+    },
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const gridDiv = document.querySelector("#myGrid");
+    new agGrid.Grid(gridDiv, gridOptions);
+    getData(projNo);
+  });
+
+  // 삭제버튼
+  document.addEventListener("click", function (event) {
+    if (event.target.id === "deleteTaskBtn") {
+      const taskNo = document.getElementById("taskDetailtaskNo").innerText;
+      deleteTask(taskNo, header, token);
+    }
+  });
+
+  // 수정 저장 버튼
+  document.addEventListener("click", function (event) {
+    if (event.target.id === "updateSaveBtn") {
+      const taskNo = document.getElementById("taskUpdatetaskNo").innerText;
+      console.log("updateSaveTask : " + taskNo);
+      updateTaskSave(taskNo, header, token);
+    }
+  });
+
+  //일감 저장 버튼
+
+  document.addEventListener("click", function (event) {
+
+    if (event.target.id === "insertSaveBtn") {
+
+      sendMsg("task,"+ projNo + "," + '${userVo.userNm }');
+
+      insertTaskSave(projNo, header, token);
+
+    }
+  });
+</script>

@@ -1,0 +1,9 @@
+package team.tttt.pms.project.alarm.service;
+
+import team.tttt.pms.project.vo.AlarmVO;
+
+public interface AlarmService {
+
+	public void saveAlarm(AlarmVO aVO);
+
+}

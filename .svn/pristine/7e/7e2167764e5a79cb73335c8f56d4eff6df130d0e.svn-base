@@ -1,0 +1,22 @@
+package team.tttt.pms.project.chatting.web;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@RequestMapping("/pms/project")
+@Slf4j
+public class ChattingController {
+
+
+	@RequestMapping("/chatting")
+	public String list(String projNo, Model model) {
+		model.addAttribute("projNo",projNo);
+		return "pms/com/chatting";
+	}
+
+
+}

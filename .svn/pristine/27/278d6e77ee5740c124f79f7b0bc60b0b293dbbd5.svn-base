@@ -1,0 +1,17 @@
+package team.tttt.pms.common.user.web;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class Test3Controller {
+
+	@GetMapping("/ttt")
+	public String testView(HttpServletRequest request) {
+		System.out.println(request.getSession().getServletContext().getRealPath(""));
+		return "test/newtemp";
+	}
+
+}

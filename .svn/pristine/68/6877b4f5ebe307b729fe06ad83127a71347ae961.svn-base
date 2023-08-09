@@ -1,0 +1,209 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%>
+
+<style>
+
+.outerKanban{
+ border: 1px solid black;
+}
+
+  .innerKanban {
+    border: 1px solid black;
+    width: 300px;
+    height: 600px;
+  }
+
+  .container {
+    display: flex;
+  }
+</style>
+
+<div class="content pb-3">
+<!--   <div class="container container-fluid h-100" id="kabanBody">
+    <div class="innerKanban card card-row card-secondary" id="taskAwait">
+      <div class="card-header">
+        <h3 class="card-title">대기</h3>
+      </div>
+      <div class="card-body" id="taskAwaitBody">
+        여기가 카드 바디 부분
+      </div>
+    </div>
+
+    <div class="innerKanban card card-row card-secondary" id="taskProgress">
+      <div class="card-header">
+        <h3 class="card-title">진행</h3>
+      </div>
+      <div class="card-body" id="taskProgressBody">
+        여기가 카드 바디 부분
+      </div>
+    </div>
+
+    <div class="innerKanban card card-row card-secondary" id="taskComplete">
+      <div class="card-header">
+        <h3 class="card-title">완료</h3>
+      </div>
+      <div class="card-body" id="taskCompleteBody">
+        여기가 카드 바디 부분
+      </div>
+    </div>
+
+    <div class="innerKanban card card-row card-secondary" id="taskDelay">
+      <div class="card-header">
+        <h3 class="card-title">지연</h3>
+      </div>
+      <div class="card-body" id="taskDelayBody">
+        여기가 카드 바디 부분
+      </div>
+    </div>
+  </div> -->
+
+<div class="outerKanban">
+<div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 mt-xxl-4 mt-xl-4 mt-lg-4 mt-md-4 mt-sm-4 mt-4 outerKanban">
+	<h6 class="fw-bold py-3 mb-0">상태 : 진행중</h6>
+	<div class="progress_task outerKanban">
+		<div class="outerKanban" data-plugin="nestable">
+			<ol class="dd-list" id="pwInProgress">
+   	<li class="dd-item" > 제목
+         <div class="dd-handle" class="outerKanban">
+             <div class="task-info d-flex align-items-center justify-content-between outerKanban">
+                 <h6 class="light-info-bg py-1 px-2 rounded-1 d-inline-block fw-bold small-14 mb-0">제목:</h6>
+                 <div class="task-priority d-flex flex-column align-items-center justify-content-center outerKanban">
+                     <span class="badge bg-secondary text-end mt-2">담당자: 박승우</span>
+                     <span class="badge bg-primary text-end mt-2">상태: 긴급</span>
+                     <div class="avatar-list avatar-list-stacked m-0 outerKanban">
+						 <img class="avatar rounded-circle small-avt" src="https://i.namu.wiki/i/U9XjzBKZaxeTkElVFZ7EteaNxN9x3ZpacnHWUSiBqZs-3fgXyRv2slAb4MoA-brxiORjxHhH9g6c_x6HZdYTqg.webp" alt=""> 담당자
+                     </div>
+                 </div>
+             </div>
+             <p class="py-2 mb-0">컨텐츠</p>
+             <div class="tikit-info row g-3 align-items-center outerKanban">
+                 <div class="col-sm outerKanban">
+                             <div class="d-flex align-items-center outerKanban">
+                                 <i class="icofont-flag"></i> <span class="ms-1">날짜~날짜 </span>
+                             </div>
+                 </div>
+                 <div class="col-sm text-end outerKanban">
+                     <div class=" small text-truncate light-danger-bg py-1 px-2 rounded-1 d-inline-block fw-bold small"> 우선순위 : </div>
+                 </div>
+             </div>
+         </div>
+     </li>
+
+			</ol>
+		</div>
+	</div>
+</div>
+
+
+<div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 mt-xxl-4 mt-xl-4 mt-lg-4 mt-md-4 mt-sm-4 mt-4 outerKanban">
+	<h6 class="fw-bold py-3 mb-0">상태 : 진행중</h6>
+	</div>
+</div>
+
+
+
+
+
+<script>
+  projNo = "a005";
+
+ /*
+  function getData(projNo) {
+    $.ajax({
+      url: "/pms/project/taskListOut?${_csrf.parameterName}=${_csrf.token}",
+      data: {
+        projNo: projNo,
+      },
+      type: "POST",
+      dataType: "json",
+      success: function (res) {
+        res = res.map((data) => {
+          const userNms = data.asgList.map((item) => item.userNm);
+          return { ...data, userNms };
+        });
+        console.log("넘어온 데이터", res);
+        let wait = "";
+        let progress = "";
+        let complete = "";
+        let delay = "";
+
+        for (let i = 0; i < res.length; i++) {
+          console.log(res[i], "+ res");
+          if (res[i].taskStts == "대기") {
+            wait += `
+					<div class="card card-info card-outline">
+					<div class="card-header">
+						<h5 class="card-title">\${res[i].taskTitle}</h5>
+						<div class="card-tools">
+						</div>
+					</div>
+					<div class="card-body">
+						\${res[i].taskCn}
+						\${res[i].taskBengDt}
+						\${res[i].taskDdlnDt}
+						\${res[i].taskPriority}
+					</div>
+					</div>`;
+          } else if (res[i].taskStts == "진행") {
+            progress += `
+					<div class="card card-info card-outline">
+					<div class="card-header">
+						<h5 class="card-title">\${res[i].taskTitle}</h5>
+						<div class="card-tools">
+						</div>
+					</div>
+					<div class="card-body">
+						\${res[i].taskCn}
+						\${res[i].taskBengDt}
+						\${res[i].taskDdlnDt}
+						\${res[i].taskPriority}
+					</div>
+					</div>`;
+          } else if (res[i].taskStts == "완료") {
+            complete += `
+					<div class="card card-info card-outline">
+					<div class="card-header">
+						<h5 class="card-title">\${res[i].taskTitle}</h5>
+						<div class="card-tools">
+						</div>
+					</div>
+					<div class="card-body">
+						\${res[i].taskCn}
+						\${res[i].taskBengDt}
+						\${res[i].taskDdlnDt}
+						\${res[i].taskPriority}
+					</div>
+					</div>`;
+          } else if (res[i].taskStts == "지연") {
+            delay += `
+					<div class="card card-info card-outline">
+					<div class="card-header">
+						<h5 class="card-title">\${res[i].taskTitle}</h5>
+						<div class="card-tools">
+						</div>
+					</div>
+					<div class="card-body">
+						\${res[i].taskCn}
+						\${res[i].taskBengDt}
+						\${res[i].taskDdlnDt}
+						\${res[i].taskPriority}
+					</div>
+					</div>`;
+          }
+        }
+
+        $("#taskWaitBody").html(wait);
+        $("#taskProgressBody").html(progress);
+        $("#taskCompleteBody").html(complete);
+        $("#taskDelayBody").html(delay);
+        console.log("완료");
+      },
+      error: function (xhr, status, error) {
+        console.error(error);
+      },
+    });
+  }
+
+  getData(projNo);
+  */
+</script>

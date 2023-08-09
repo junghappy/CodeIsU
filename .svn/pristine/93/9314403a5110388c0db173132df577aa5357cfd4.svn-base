@@ -1,0 +1,73 @@
+package team.tttt.pms.stu.resume.web;
+
+import javax.inject.Inject;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import lombok.extern.slf4j.Slf4j;
+import team.tttt.pms.common.enums.ServiceResult;
+import team.tttt.pms.common.utils.cmdcd.service.CmCdService;
+import team.tttt.pms.common.utils.cmdcd.service.impl.CmCdServiceImpl;
+import team.tttt.pms.common.vo.CustomUser;
+import team.tttt.pms.common.vo.UserVO;
+import team.tttt.pms.stu.resume.service.ResumeService;
+import team.tttt.pms.stu.vo.ResumeVO;
+
+@Controller
+@Slf4j
+@RequestMapping("/stu/mypage/resume")
+public class ResumeController {
+
+	@Inject
+	private ResumeService resumeService;
+
+	@Inject
+	private CmCdService cmCdService;
+
+
+	@GetMapping("")
+	public String resumeMain(Authentication auth, Model model) {
+		CustomUser mVO = (CustomUser) auth.getPrincipal();
+		UserVO userVO = mVO.getMember();
+		model.addAttribute("user", userVO);
+		return "stu/com/mypage/resume/list";
+
+	}
+
+
+	@GetMapping("/write")
+	public String resumeWrite(Authentication auth, Model model) {
+		CustomUser mVO = (CustomUser) auth.getPrincipal();
+		UserVO userVO = mVO.getMember();
+		model.addAttribute("user", userVO);
+		model.addAttribute("cmcd_schlSeCd", cmCdService.readCMCdoe("R001"));
+
+
+		return "stu/com/resume/write";
+	}
+
+	@PostMapping("/write")
+	public String resumeInsert(ResumeVO resumeVO, Authentication auth) {
+		CustomUser mVO = (CustomUser) auth.getPrincipal();
+		UserVO userVO = mVO.getMember();
+		resumeVO.setStuNo(userVO.getUserNo());
+
+		ServiceResult result = null;
+
+		{
+			System.out.println(resumeVO);
+		}
+
+
+		result = resumeService.resumeInsert(resumeVO);
+
+
+
+		return null;
+	}
+}

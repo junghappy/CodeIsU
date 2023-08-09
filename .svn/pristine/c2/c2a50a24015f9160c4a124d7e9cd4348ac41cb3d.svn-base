@@ -1,0 +1,1072 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+
+<!-- 공통코드 -->
+<script src="${pageContext.request.contextPath}/common/sw/js/CommonCode.js"></script>
+
+<style>
+.form-control {
+	text-align: left;
+	border: 1px solid #E6E3E2;
+}
+
+#mUpBtn, #mDelBtn, #mSubBtn, #mUpBtn2, #mDelBtn2 {
+	background-color: #5f76e8;
+	color: white;
+}
+
+#mcanBtn, #mcanBtn2 {
+	border: 1px solid #E6E3E2;
+}
+
+input {
+	border: 1px solid #E6E3E2;
+}
+.NotComment{
+	margin-top: 10px;
+	font-size: 14px;
+}
+.CommentStyle{
+	background-color: #f0f2f5;
+}
+#upComment, #delComment, #cnBtn{
+	cursor: pointer;
+}
+#commentCn {
+	height:70px;
+	border:none;
+}
+.hrline{
+	border:1px solid #f0f2f5;
+	width:100%;
+	height:1px;
+}
+#commentDetail{
+	height:145px;
+}
+/* 무한 스크롤 시작 영역 */
+.scroll-Wrap {
+	max-height: 150px;
+	overflow-y: auto;
+	direction: ltr;
+	scrollbar-color: #d4aa70 #e4e4e4;
+}
+
+.scroll-Wrap::-webkit-scrollbar {
+ 	width: 10px;  /* 세로축 스크롤바 폭 너비 */
+    height: 20px;  /* 가로축 스크롤바 폭 너비 */
+}
+
+.scroll-Wrap::-webkit-scrollbar-track {
+  background-color: #e4e4e4;
+  border-radius: 100px;
+}
+
+.scroll-Wrap::-webkit-scrollbar-thumb {
+  border-radius: 50px;
+  border-left: 0;
+  border-right: 0;
+  background-color: #CEC8C7;
+}
+
+.scroll-Wrap2 {
+	max-height: 70px;
+	overflow-y: auto;
+	direction: ltr;
+	scrollbar-color: #d4aa70 #e4e4e4;
+}
+
+.scroll-Wrap2::-webkit-scrollbar {
+ 	width: 10px;  /* 세로축 스크롤바 폭 너비 */
+    height: 20px;  /* 가로축 스크롤바 폭 너비 */
+}
+
+.scroll-Wrap2::-webkit-scrollbar-track {
+  background-color: #e4e4e4;
+  border-radius: 100px;
+}
+
+.scroll-Wrap2::-webkit-scrollbar-thumb {
+  border-radius: 50px;
+  border-left: 0;
+  border-right: 0;
+  background-color: #CEC8C7;
+}
+
+
+</style>
+<div class="card" id="issueList"></div>
+
+
+
+<!--  이슈 생성  Modal 시작  -->
+<div class="modal fade" id="insertModal" role="dialog" aria-labelledby="insertModalLabel" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center" role="document">
+		<div class="modal-content" id="modalContent">
+
+		</div>
+	</div>
+</div>
+<!-- 이슈 생성  Modal 끝 -->
+
+<!--  이슈 상세보기  Modal 시작  -->
+<div class="modal fade" id="detailModal" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center" role="document">
+		<div class="modal-content" id="modalDetail">
+
+		</div>
+	</div>
+</div>
+<!-- 이슈 상세보기 Modal 끝 -->
+
+<!--  이슈 수정  Modal 시작  -->
+<div class="modal fade" id="UpModal" role="dialog" aria-labelledby="UpModalLabel" aria-hidden="true">
+	<div class="modal-dialog d-flex justify-content-center" role="document">
+		<div class="modal-content" id="modalUpdate">
+
+		</div>
+	</div>
+</div>
+<!-- 이슈 상세보기 Modal 끝 -->
+<script>
+
+//날짜 수정
+function convertDate(Cdate) {
+const year = Cdate.substring(0, 5);
+const month = Cdate.substring(5, 7);
+const day = Cdate.substring(7, 10);
+const formattedDate = year +  month +  day;
+return formattedDate;
+}
+//날짜 수정 하이픈 제거
+function converDate2(Cdate){
+	const formattedDate = Cdate.replaceAll("-", "");
+	return formattedDate;
+}
+
+//서버에서 발행된 헤더네임과 토큰갑사 저장
+var header = '${_csrf.headerName}';
+var token =  '${_csrf.token}';
+
+  const projNo = "a005";
+  let page;
+  let searchType;
+  let searchWord;
+
+// 프로젝트 팀원 리스트 추출 수정 모달에서 사용
+const getTeamMemTaskList = (projNo, selection, tagId) => {
+  $.ajax({
+    url: "/pms/project/extractMem",
+    data: {
+      projNo: projNo,
+    },
+    type: "get",
+    dataType: "json",
+    success: function (res) {
+      console.log("팀원", res);
+      let teamOption = "";
+      for (let i = 0; i < res.length; i++) {
+        const isSelected = selection.includes(res[i].userNm) ? "selected" : "";
+        teamOption += `<option value=\${res[i].stuNo} \${isSelected}>\${res[i].userNm}</option>`;
+      }
+
+      console.log("getTeamMemList : " + teamOption);
+      $("#"+tagId).html(teamOption);
+    },
+    error: function (xhr) {
+      console.log("getTeamMemList 상태: " + xhr.status);
+    },
+  });
+};
+
+
+
+
+const getTeamMemList = (projNo, tagId) => {
+  $.ajax({
+    url: "/pms/project/extractMem",
+    data: {
+      projNo: projNo,
+    },
+    type: "get",
+    dataType: "json",
+    success: function (res) {
+      console.log("팀원", res);
+      let teamOption = "";
+      for (let i = 0; i < res.length; i++) {
+        teamOption += `<option value=\${res[i].stuNo}>\${res[i].userNm}</option>`;
+      }
+      console.log("getTeamMemList : " + teamOption);
+      $("#"+ tagId).html(teamOption);
+    },
+    error: function (xhr) {
+      console.log("getTeamMemList 상태: " + xhr.status);
+    },
+  });
+};
+
+
+
+  const issueList = (projNo, page, searchType, searchWord) => {
+    if (page == null) {
+      page = 1;
+    }
+
+    if (searchType == null) {
+      searchType = "title";
+    }
+
+
+    $.ajax({
+      url: "/pms/project/issueList",
+      data: {
+        projNo: projNo,
+        currentPage: page,
+        searchType: searchType,
+        searchWord: searchWord,
+      },
+      type: "get",
+      dataType: "json",
+      success: function (res) {
+        console.log(res);
+        console.log(res.pagingVO);
+        console.log(res.pagingVO.dataList);
+
+       const dataList = res.pagingVO.dataList;
+        const pagingHTML = res.pagingVO.pagingHTML;
+
+        let projectissueList = `
+
+        <form class="input-group input-group-outline" id="searchForm">
+            <input type="hidden" name="page" id="page" />
+            <div class="col-md-1">
+                <div class="input-group input-group-static mb-4">
+                <select class="form-control" id="searchType">
+                    <option value="title" id="searchTypeTitle">제목</option>
+                    <option value="writer" id="searchTypeWriter">작성자</option>
+                    <option value="titleWriter" id="searchTypeTitleWriter">제목+작성자</option>
+                </select>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="ms-md-auto">
+                <label class="form-label"></label>
+                <input type="text" id="searchWord" name="searchWord" class="form-control" placeholder="Search" />
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="button" id="searchBtn" class="btn btn-outline-secondary">
+                <i class="fas fa=search"></i>검색
+                </button>
+            </div>
+
+            <div class="col-md-2">
+                <button type="button" id="insertStorageBtn" class="btn btn-outline-secondary">
+               등록
+                </button>
+                <button type="button" id="sendBell" class="btn btn-outline-secondary">
+               알람테스트등록
+                </button>
+            </div>
+
+        </form>
+
+
+  <div class="table-responsive">
+  <table class="table">
+      <thead>
+        <tr>
+          <th class="text-center" scope="col">번호</th>
+          <th class="text-center" scope="col">이슈제목</th>
+          <th class="text-center" scope="col">담당자</th>
+          <th class="text-center" scope="col">등록자</th>
+          <th class="text-center" scope="col">등록일</th>
+          <th class="text-center" scope="col">이슈상태</th>
+        </tr>
+      </thead>
+      <tbody>
+        `;
+        for (let i = 0; i < dataList.length; i++) {
+          projectissueList += `
+        <tr>
+          <td class="text-center">\${dataList[i].rnum}</td>
+
+          <td id="issueTtl" data-value="\${dataList[i].issueNo}">\${dataList[i].issueTtl}</td>
+
+          <td class="text-center">\${dataList[i].issueAsg}</td>
+
+          <td class="text-center" id="writer">\${dataList[i].userNm}</td>
+
+          <td class="text-center">\${dataList[i].issueRegDt}</td>
+
+          <td class="text-center">\${dataList[i].issueSttsCd}</td>
+
+
+        </tr>
+        `;
+        }
+
+        projectissueList += `
+            </tbody>
+            </table>
+        </div>
+        <div class="card-footer clearfix" id="pagingArea">
+            \${pagingHTML}
+        </div>
+        `;
+        $("#issueList").html(projectissueList);
+        $("#page").val(page);
+        $("#searchType").val(searchType);
+        $("#searchWord").val(searchWord);
+
+        console.log(
+          "page, searchType, searchWord : ",
+          page,
+          searchType,
+          searchWord
+        );
+        pagingClick();
+        tableClick();
+
+      },
+      error: function (xhr) {
+        console.log("issueList 상태: " + xhr.status);
+      },
+    });
+  };
+
+  issueList(projNo, page, searchType, searchWord);
+
+  const pagingClick = () => {
+    let searchForm = $("#searchForm");
+    let pagingArea = $("#pagingArea");
+
+    let searchBtn = $("#searchBtn");
+
+    let shWord = "";
+    let shType = "";
+
+    searchBtn.on("click", function () {
+      shWord = $("#searchWord").val();
+      shType = $("#searchType").val();
+
+      issueList(projNo, page, shType, shWord);
+    });
+
+    pagingArea.on("click", "a", function (event) {
+      event.preventDefault();
+      var pageNo = $(this).data("page");
+      searchForm.find("#page").val(pageNo);
+
+      shWord = $("#searchWord").val();
+      shType = $("#searchType").val();
+
+      issueList(projNo, pageNo, shType, shWord);
+    });
+  };
+
+
+  /* 이슈 등록 버튼  */
+  $("#issueList").on("click","#insertStorageBtn",function(){
+
+    const insertModal = `
+		<div class="modal-header">
+        <h5 class="modal-title font-weight-normal" >이슈 등록하기</h5>
+        </div>
+
+      <div class="modal-body">
+         <form>
+   		<div class="d-flex justify-content-start mb-3">
+         <label class="w-20 pt-2 form-label" for="missueTtl">이슈제목</label>
+         <input type="text" class="form-control mb-2 ps-2" id="missueTtl" name="issueTtl"></textarea>
+	    </div>
+  		<div class="d-flex justify-content-start mb-3">
+	      <label class="w-20 pt-2 form-label" for="mIssueCd">이슈코드</label>
+	      <select class="ps-2 form-select mem" id="mIssueCd" name="issueCd">
+		  </select>
+        </div>
+
+
+
+		<div class="d-flex justify-content-start mb-3">
+			<label class="w-20 pt-2 form-label" for="missueAsg">담당자</label>
+				<select class="form-select ps-2" id="missueAsg" name="issueAsg">
+				</select>
+		</div>
+
+
+        <div class="d-flex justify-content-start mb-3">
+		  <label class="w-20 pt-2 form-label" for="mCon">이슈내용</label>
+          <textarea class="form-control mb-2 ps-2" id="mCon" name="issueCn"></textarea>
+        </div>
+	    <div class="d-flex justify-content-start mb-3">
+		  <label class="w-20 pt-2 form-label" for="mIssueSttsCd">이슈상태</label>
+	      <select class="ps-2 form-select mem" id="mIssueSttsCd" name="issueSttsCd">
+
+		  </select>
+	    </div>
+
+
+	      <div class="modal-footer">
+	        <button type="button" class="btn bg msubBtn" id="mSubBtn">등록</button>
+	        <button type="reset" class="btn bg mcanBtn" data-bs-dismiss="modal" id="mcanBtn">취소</button>
+	      </div>
+        </form>
+      </div>
+		`
+
+      $("#modalContent").html(insertModal);
+	  getCodeOptionOneSelected("P007","mIssueCd",mIssueCd);
+	  getCodeOptionOneSelected("P006","mIssueSttsCd",mIssueSttsCd);
+	  getTeamMemList(projNo,'missueAsg')
+
+      $("#insertModal").modal("show");
+
+
+
+  })
+
+
+	document.addEventListener("click", function (event) {
+		var projNo = 'a005';
+		var stuNo = 'S2302101';
+
+		if (event.target.id === "mSubBtn") {
+			var data = {
+				issueTtl : $("#missueTtl").val(),
+				issueCd : $("#mIssueCd").val(),
+			  	issueCn : $("#mCon").val(),
+			  	issueSttsCd : $("#mIssueSttsCd").val(),
+			  	issueAsg : $("#missueAsg").val(),
+			  	stuNo : stuNo,
+			  	projNo : projNo
+
+			};
+
+		console.log("등록시 넘어오는 데이터 :",data);
+	//서버로 보내기
+		insertIssue(data);
+		$("#insertModal").modal("hide");
+
+	    }
+});
+
+  	/* 이슈 등록 후 데이터 받아오기 */
+	function insertIssue(data) {
+
+			$.ajax({
+				url : "/pms/project/insertissue",
+				type : "post",
+				data : JSON.stringify(data),
+
+				dataType : "text",
+				contentType : "application/json; charset=utf-8",
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success : function(res) {
+
+					alert("이슈 등록 성공!!")
+					issueList(projNo, page, searchType, searchWord);
+
+
+				},
+				error : function(xhr){
+					alert(xhr.status);
+				}
+			})
+	}
+
+
+  	/* 알람 테스트 버튼 */
+	$(document).ready(function() {
+		$("#sendBell").on("click", function() {
+			//socket
+
+			//연결
+			connect();
+			function connect() {
+				webSocket = new WebSocket("ws://localhost:80/minjung"); // End Point
+				//이벤트에 이벤트핸들러 뜽록
+				webSocket.onopen = fOpen; // 소켓 접속되면 짜똥 실행할 함수(fOpen)
+				webSocket.onmessage = fMessage; // 써버에서 메쎄징 오면  짜똥 실행할 함수(fMessage)
+			}
+
+			//연결 시
+			function fOpen() {
+				 webSocket.send("이슈코드명" + "등록되었습니다.");
+			}
+			function send() {  // 써버로 메쎄찡 떤쏭하는 함수
+				/* let msg = c_message.value; */
+				let msg = "텍스트 아무거나";
+				webSocket.send( msg);
+				/* c_message.value = ""; */
+			}
+
+			function fMessage() {
+
+				const bell = document.querySelector("#bell");
+				const bell2 = $(".fa-bell");
+				let data = event.data;
+
+				/* bell.innerHTML = bell.innerHTML + "<br/>" + data; */
+				/* bell2.html(data); */
+				bell2.addClass("fa-solid fa-umbrella");
+
+				//$("#messageBox").append("<p>새로운 이슈 등록</p>")
+				var ddd = "<li class=\"mb-2\">dddd</li>";
+				$(".dropdown-menu").prepend(data); //요소 맨위에 추가
+			}
+			function disconnect() { //써버와 인연 끊는 함쑹
+			/* 	webSocket.send(myId + "님이 뛰쳐나갔쪙"); */
+				webSocket.close();
+			}
+
+		});
+	});
+
+	/* 이슈 디테일 모달 띄우기 */
+	const tableClick = () => {
+
+		console.log('tableClick() 실행')
+
+		$(".table").on("click","#issueTtl",function(){
+			var issueNo = $(this).data("value");
+
+			console.log("issueNo : ",issueNo)
+
+      let detailModal= `
+		  <div class="modal-header">
+	        <h5 class="modal-title font-weight-normal" id="detailModalLabel">이슈 상세보기</h5>
+	      </div>
+
+	      <div class="modal-body">
+	      	<form>
+			        <input type="hidden" class="w-20 pt-2 form-label" id="dIssueNo"></label>
+			        <div class="d-flex justify-content-start mb-3">
+			            <label class="w-20 pt-2 form-label" for="dIssueTitle">이슈제목</label>
+			            <input type="text" class="form-control line w-100" id="dIssueTitle" disabled>
+			        </div>
+
+			        <div class="d-flex justify-content-start mb-3">
+			            <label class="w-20 pt-2 form-label" for="dIssueCd">이슈코드</label>
+			            <input type="text" class="form-control line w-100" id="dIssueCd" disabled>
+			        </div>
+
+				    <div class="d-flex justify-content-start mb-3">
+			          <label class="w-20 pt-2 form-label" for="dIssueSttsCd">이슈상태</label>
+			            <input type="text" class="form-control line w-100" id="dIssueSttsCd" disabled>
+			          </div>
+
+				    <div class="d-flex justify-content-start mb-3">
+			          <label class="w-20 pt-2 form-label" for="dIssueNm">담당자</label>
+			          <input type="text" class="form-control line w-100" id="dIssueNm" disabled>
+					</div>
+
+			        <div class="d-flex justify-content-start mb-3">
+					  <label class="w-20 pt-2 form-label" for="dIssueCn">이슈내용</label>
+					  <input type="text" class="form-control line w-100" id="dIssueCn" disabled>
+			        </div>
+
+			        <div class="mb-2 hrline"></div>
+
+			 		<div class="" style="height:150px;"><h6 class="">COMMENTS</h6>
+				 	<div class="border rounded scroll-Wrap" >
+
+				 		<!-- 코멘트 하나당 div 한개씩 생성 -->
+						<div class="container" id="commentDiv">
+					 	  <div class="row">
+					 	    <div class="col-12" id="commentDetail">
+									/* 코멘트 내용 */
+					 	    </div>
+					 	  </div>
+					 	</div>
+
+					</div>
+				 	</div>
+
+					<div class="container mt-5 mb-2">
+						<div class="row">
+					  		<div class="col ps-0" style="font-size:15px;"><span>COMMENT : </span></div>
+					  	</div>
+					  	<div class="row">
+						  	<div class="border rounded col-12 ps-0 pe-0">
+					  		<textarea class="ps-2 col-12 form-control ps-0 scroll-Wrap2" id="commentCn" placeholder="코멘트 입력하기"></textarea>
+					  		<i class="mb-2 pe-2 float-end text-end material-icons opacity-10" id="cnBtn">send</i>
+					  	</div>
+					</div>
+
+			      <div class="modal-footer mt-3">
+			        <button type="button" class="btn bg mUpBtn" id="mUpBtn">수정</button>
+			        <button type="reset" class="btn bg mcanBtn" data-bs-dismiss="modal" id="mcanBtn">취소</button>
+			      </div>
+		      </form>
+	      </div>
+    `
+		data= {
+			issueNo:issueNo
+		}
+		  $.ajax ({
+
+		        url: "/pms/project/detail",
+		        type : "get",
+		        data :data,
+		        success : function (res) {
+		          console.log("디테일 res  : ", res);
+
+
+
+		          	let cn = "";
+				    $("#modalDetail").html(detailModal);
+				    $("#detailModal").modal("show");
+
+
+				    for(let i = 0; i < res.cmntVoList.length; i++) {
+				  	  	cn +=res.cmntVoList[i].cmntCn;
+				    }
+
+				    console.log("코멘트 내용 가져와지나? :",cn);
+
+				    if (cn === null || cn === "" || cn === "null") {
+				    	$("#commentDetail").html("<p class='NotComment'>코멘트가 없습니다.</p>");
+				    } else {
+				    	$("#commentDetail").html(""); // 코멘트 내용 초기화
+
+				    	//직책 가져오기
+				    	let managejbttl="";
+             		    res.manageVoList.forEach(function(manage) {
+             				managejbttl += `\${manage.jbttlCd}`;
+             		    })
+
+						CmntList(data)
+
+
+				    }
+
+				    $("#dIssueNo").val(res.issueNo);
+				    $("#dIssueTitle").val(res.issueTtl);
+				    $("#dIssueCd").val(res.issueCd);
+				    $("#dIssueSttsCd").val(res.issueSttsCd);
+				    $("#dIssueNm").val(res.issueAsg);
+				    $("#dIssueCn").val(res.issueCn);
+
+		        },
+
+		        error : function(xhr){
+					alert(xhr.status);
+				}
+
+		    })
+
+
+		})
+
+	}
+
+
+	function CmntList(data){
+		$.ajax ({
+			url: "/pms/project/detail",
+			type : "get",
+			data :data,
+			success : function (res) {
+			console.log("디테일 res 2: ", res.cmntVoList );
+			let cmnt = "";
+			console.log('res.cmntVoList.length', res.cmntVoList.length)
+							    	//직책 가져오기
+			let managejbttl="";
+            res.manageVoList.forEach(function(manage) {
+             		managejbttl += `\${manage.jbttlCd}`;
+             })
+
+				for(let i=0; i<res.cmntVoList.length; i++){
+					console.log('res.cmntVoList[i]', res.cmntVoList[i])
+					let cmntVo = res.cmntVoList[i]
+					cmnt +=
+						`<div class="commnet-Wrap" data-value="\${cmntVo.cmntNo}">
+								<div class="row ps-2 mt-2">
+									<div class="col-5" style="font-size:12px;">
+										\${managejbttl} : \${cmntVo.stuNo} &nbsp;&nbsp; \${convertDate(cmntVo.cmntBengDt)}
+									</div>
+
+									<div class="col-7 text-xxs text-end button-Wrap">
+										<span id="upComment">
+											<i class="material-icons opacity-10">edit_note</i>
+										</span>
+										<span id="delComment">
+											<i class="material-icons opacity-10">clear</i>
+										</span>
+									</div>
+
+								</div>
+									<div class="row mb-3">
+										<div class="col-12" >
+											<textarea class="w-100 rounded CommentStyle" style="height:50px;" disabled>\${cmntVo.cmntCn}</textarea>
+										</div>
+											</div>
+									</div>
+									`
+							   console.log('cmnt',cmnt)
+							}
+							console.log('cmnt',cmnt)
+							$("#commentDetail").html(cmnt);
+							}
+						})
+
+						}
+
+
+	/* 코멘트 등록 */
+
+	$("#modalDetail").on("click", "#cnBtn", function(){
+
+		var cIssueNo = $("#dIssueNo").val();
+		var stuNo = "S2301101";
+		console.log("commnet IssueNoㅋ: " , cIssueNo);
+		console.log("commnet stuNoㅋ: " , stuNo);
+
+		var addCn = $("#commentCn").val();
+		console.log(addCn);
+
+
+		var data = {
+			issueNo : cIssueNo,
+			cmntCn	: addCn,
+			stuNo : stuNo
+		}
+
+		var issueNo = {
+			issueNo : cIssueNo,
+		}
+
+		$.ajax({
+	        url: "/pms/project/insertcomment",
+	        type : "post",
+	        data :JSON.stringify(data),
+	        dataType : "text",
+			contentType:"application/json;charset=utf-8",
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+	        success : function (res) {
+	          console.log("등록 한거 가져와지낭 res  : ", res);
+			   alert("성공")
+
+ 			   $("#commentCn").val("");
+
+				CmntList(issueNo)
+	        },
+
+	        error : function(xhr){
+				alert(xhr.status);
+			}
+		})
+	})
+
+
+	/* 코멘트 수정 */
+	$("#modalDetail").on("click","#upComment",function(){
+
+		// 클릭된 아이콘이 속한 부모 요소인 .aplyClick 클래스를 찾음
+	    var parent = $(this).closest(".commnet-Wrap");
+
+	 	// 해당 부모 요소의 value 속성 값을 가져옴
+	 	var cmntNo = parent.data("value");
+	 	console.log("cmntNo당 : " , cmntNo)
+
+	 	var data = {cmntNo : cmntNo};
+
+		$.ajax({
+			url : "/pms/project/detailcommnet",
+			type : "get",
+			data : data,
+			success : function(res) {
+
+				let check = `<i class="material-icons opacity-10" id="check">check_circle</i>
+							 <i class="material-icons opacity-10" id="upcancel">clear</i>
+				`;
+
+				console.log("코멘트 수정 버튼 눌렀을 때 불러오는 값 : ", res);
+				//alert("내용 불러오기 성공")
+
+				//textarea 원래 html
+				textareaWrap = parent.find(".CommentStyle").html();
+
+				// textarea의 disabled 속성 해제
+           		parent.find(".CommentStyle").prop("disabled", false);
+
+				// textarea의 배경색 변경
+           		parent.find(".CommentStyle").css("background", "white");
+
+				parent.find(".CommentStyle").val(res.cmntCn);
+
+				ButtonWrapContent = parent.find(".button-Wrap").html(); // 원래 내용을 저장
+				parent.find(".button-Wrap").html(check);
+			},
+
+			error : function(xhr){
+				alert(xhr.status);
+			}
+
+		})
+
+	})
+
+	/* 코멘트 수정 내용 보내기 */
+	$("#modalDetail").on("click","#check",function(){
+		// 클릭된 아이콘이 속한 부모 요소인 .aplyClick 클래스를 찾음
+	    var parent = $(this).closest(".commnet-Wrap");
+
+	 	 // 해당 부모 요소의 value 속성 값을 가져옴
+	 	var cmntNo = parent.data("value");
+	 	console.log("수정 데이터 보낼 cmntNo당 : " , cmntNo)
+
+	 	var data = {
+	 		cmntNo : cmntNo,
+	 		cmntCn : parent.find(".CommentStyle").val()
+	 	};
+
+
+	 	console.log("수정할 data : ", data)
+
+	 	$.ajax({
+			url : "/pms/project/updatecomment",
+			type : "post",
+			data: JSON.stringify(data),
+			contentType:"application/json;charset=utf-8",
+			beforeSend: function(xhr) {
+			    xhr.setRequestHeader(header, token);
+			},
+			dataType: "text",
+			success : function(res) {
+				console.log("수정할 res" , res)
+				parent.find(".button-Wrap").html(ButtonWrapContent); 		// 원래 내용으로 복구
+				parent.find(".CommentStyle").prop("disabled", true); 		// 원래 내용으로 복구
+				parent.find(".CommentStyle").css("background-color", ""); 	// 원래 내용으로 복구
+				alert("코멘트 수정 완료!!!!!!!! ")
+
+			},
+
+			error : function(xhr){
+				alert('aaa'+xhr.status);
+			}
+	 	})
+	})
+
+
+
+	/* 코멘트 삭제 */
+	$("#modalDetail").on("click","#delComment",function(){
+		// 클릭된 아이콘이 속한 부모 요소인 .aplyClick 클래스를 찾음
+	    var parent = $(this).closest(".commnet-Wrap");
+
+		let dIssueNo = $("#dIssueNo").val();
+
+		let issueNo = {
+			issueNo:dIssueNo
+		}
+
+	 	 // 해당 부모 요소의 value 속성 값을 가져옴
+	 	var cmntNo = parent.data("value");
+	 	console.log("수정 데이터 보낼 cmntNo당 : " , cmntNo)
+
+	 	var data = {
+	 		cmntNo : cmntNo,
+	 	};
+
+
+	 	console.log("삭제할 할 data : ", data)
+
+	 	$.ajax({
+			url : "/pms/project/delcomment",
+			type : "post",
+			data: JSON.stringify(data),
+			contentType:"application/json;charset=utf-8",
+			beforeSend: function(xhr) {
+			    xhr.setRequestHeader(header, token);
+			},
+			success : function(res) {
+				console.log("삭제할 res" , res)
+
+				alert("코멘트 삭제 완료!!!!!!!! ")
+				CmntList(issueNo)
+
+			},
+
+			error : function(xhr){
+				alert('aaa'+xhr.status);
+			}
+	 	})
+	})
+
+	/* 이슈 내용 수정 데이터 보내기 모달 */
+	 $("#UpModal").on("click","#mUpBtn2",function(){
+
+		 var uIssueNo = $("#dIssueNo").val();
+		 console.log("uIssueNo" , uIssueNo);
+		 var data = {
+				 issueNo : uIssueNo,
+				 issueTtl : $("#uIssueTitle").val(),
+				 issueCd : $("#uIssueCd").val(),
+				 issueSttsCd : $("#uIssueSttsCd").val(),
+				 issueAsg : $("#issueAsg").val(),
+				 issueCn : $("#uIssueCn").val()
+		 };
+
+		 console.log("업데이트 내용들  : ", data)
+
+		 if(confirm("내용을 변경 하시겠습니까?")){
+			 $.ajax({
+				 url : "/pms/project/update",
+				 type : "post",
+				 data : JSON.stringify(data),
+				 contentType:"application/json;charset=utf-8",
+				 beforeSend: function(xhr) {
+				     xhr.setRequestHeader(header, token);
+				 },
+				 dataType : "text",
+				 success : function(res) {
+					 console.log("변경될 res: ", res);
+					 alert("내용이 수정되었습니다.")
+
+					 $("#UpModal").modal("hide");
+					 issueList(projNo, page, searchType, searchWord);
+
+				 },
+			        error : function(xhr){
+						alert(xhr.status);
+			}
+
+			 })
+		 }
+	 })
+
+
+	 /* 이슈 수정 데이터 받아오기 */
+	$("#modalDetail").on("click","#mUpBtn",function(){
+
+	    $("#detailModal").modal("hide");
+
+		var uIssueNo = $("#dIssueNo").val();
+
+		data= {
+			issueNo:uIssueNo
+		}
+
+		console.log(uIssueNo);
+
+		 let updateModal= `
+			  <div class="modal-header">
+		        <h5 class="modal-title font-weight-normal" id="detailModalLabel">이슈 수정하기</h5>
+		      </div>
+
+		      <div class="modal-body">
+		      	<form>
+				        <div class="d-flex justify-content-start mb-3">
+				            <label class="w-20 pt-2 form-label" for="uIssueTitle">이슈제목</label>
+				            <input type="text" class="ps-3 form-control line w-100" id="uIssueTitle" >
+				        </div>
+
+				        <div class="d-flex justify-content-start mb-3">
+				            <label class="w-20 pt-2 form-label" for="uIssueCd">이슈코드</label>
+				            <select class="ps-3 form-select mem" id="uIssueCd" name="issueCd">
+				  		  </select>
+				        </div>
+
+					    <div class="d-flex justify-content-start mb-3">
+				          <label class="w-20 pt-2 form-label" for="uIssueSttsCd">이슈상태</label>
+				            <select class="ps-3 form-select mem" id="uIssueSttsCd" name="issueCd">
+					  		 </select>
+					    </div>
+
+					    <div class="d-flex justify-content-start mb-3">
+				          <label class="w-20 pt-2 form-label" for="issueAsg">담당자</label>
+				          <select class="ps-3 form-select" id="issueAsg">
+
+						  </select>
+
+						</div>
+
+				        <div class="d-flex justify-content-start mb-3">
+						  <label class="w-20 pt-2 form-label" for="uIssueCn">이슈내용</label>
+
+						  <textarea class="form-control mb-2 ps-3" id="uIssueCn"></textarea>
+
+				        </div>
+
+				      <div class="modal-footer">
+				        <button type="button" class="btn bg mUpBtn" id="mUpBtn2">변경</button>
+				        <button type="button" class="btn bg mdelBtn" id="mDelBtn2">삭제</button>
+				        <button type="reset" class="btn bg mcanBtn" data-bs-dismiss="modal" id="mcanBtn2">취소</button>
+				      </div>
+			      </form>
+		      </div>
+	    `
+			  $.ajax ({
+
+			        url: "/pms/project/detail",
+			        type : "get",
+			        data : data,
+			        success : function (res) {
+			          console.log("res zz : ", res);
+
+					    $("#modalUpdate").html(updateModal);
+					    $("#UpModal").modal("show");
+
+					    $("#uIssueTitle").val(res.issueTtl);
+					    $("#uIssueCd").val(res.issueCd);
+					    $("#uIssueSttsCd").val(res.issueSttsCd);
+					    $("#issueAsg").val(res.issueAsg);
+					    $("#uIssueCn").val(res.issueCn);
+
+						getTeamMemTaskList(projNo, res.issueAsg, 'issueAsg');
+						getCodeOptionOneSelected("P007","uIssueCd", res.issueCd);
+						getCodeOptionOneSelected("P006","uIssueSttsCd",res.issueSttsCd);
+
+			        },
+			        error : function(xhr){
+								alert(xhr.status);
+					}
+
+			    })
+	})
+
+		/* 이슈 삭제 */
+		$("#UpModal").on("click","#mDelBtn2",function(){
+			 var uIssueNo = $("#dIssueNo").val();
+			 console.log("del uIssueNo: " , uIssueNo);
+
+			 if(confirm("정말 삭제하시겠습니까?")){
+			 $.ajax({
+				 url : "/pms/project/del",
+				 type : "post",
+				 data : JSON.stringify({
+					 issueNo:uIssueNo
+				 }),
+				 dataType : "text",
+				 contentType:"application/json;charset=utf-8",
+				 beforeSend: function(xhr) {
+				     xhr.setRequestHeader(header, token);
+				 },
+				 success : function(res){
+					 console.log("del res :" ,res)
+					 alert("삭제 되었습니다.")
+
+					 $("#UpModal").modal("hide");
+
+
+					 //화면에 적용
+					 issueList(projNo, page, searchType, searchWord);
+
+				 },
+			        error : function(xhr){
+						alert(xhr.status);
+					}
+			 })
+			 }
+		})
+
+
+
+ </script>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.pms.emp.stulist.mapper.StuListMapper">
+
+<!-- 학생 전체 리스트를 가져옴 -->
+<select id="getStuListAll" resultType="StuVO">
+/* team.tttt.pms.emp.stulist.mapper.StuListMapper.getStuListAll() */
+	SELECT
+	STU_NO
+	, USER_NM
+	, SVLF_NO
+	, USER_EML_ADDR
+	, USER_PHONENO
+	, USER_ZIP
+	, USER_ADDR
+	, USER_DADDR
+	, REG_DT
+	, FNSH_DT
+	, FNSH_YN
+	, ABD_YN
+	, JOIN_DT
+	, USER_PROFILE
+	, USER_BRDT
+	, USER_GENDER
+	FROM TB_STU
+</select>
+
+<!-- 연수과정 전체를 읽어온다 -->
+<select id="getSvlfAll" resultType="SvlfVO">
+/* team.tttt.pms.emp.stulist.mapper.StuListMapper.getSvlfAll() */
+	SELECT
+	SVLF_NO
+	, SVLF_BGNG_DT
+	, SVLF_DDLB_DT
+	, SVLF_NM
+	, SVLF_CN
+	, SVLF_DT
+	, EMP_NO
+	, LECTURE_ROOM_CD
+	FROM TB_SVLF
+</select>
+
+<insert id="insertStuOne" parameterType="StuVO">
+		<selectKey keyProperty="stuNo" resultType="String" order="BEFORE">
+			SELECT #{stuNo} FROM DUAL
+			<if test="stuNo != null">
+			SELECT 'S' || '45' AS concatenated_string FROM DUAL;
+
+
+			</if>
+			<if test="stuNo == null">
+
+
+			</if>
+		</selectKey>
+	<if test="stuNo == null">
+
+
+	</if>
+	<if test="stuNo != null">
+		INSERT ALL
+			INTO TB_USER (USER_NO, USER_TYPE) VALUES (#{stuNo}, 'STU')
+			INTO TB_ROLE_ASSIGN (USER_NO, ROLE_CD) VALUES (#{stuNo}, 'S01')
+			INTO TB_STU (STU_NO, USER_NM, SVLF_NO, USER_GENDER, USER_PHONENO, REG_DT) VALUES (#{stuNo}, #{userNm}, #{svlfNo}, #{userGender}, #{userPhoneno}, SYSDATE)
+		SELECT * FROM DUAL;
+	</if>
+</insert>
+
+
+</mapper>

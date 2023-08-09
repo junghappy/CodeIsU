@@ -1,0 +1,259 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!-- VS코드 작업용입니다. 사용하고지워주세요 -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<link rel="stylesheet" href="https://demos.adminmart.com/free/bootstrap/freedash-lite/src/dist/css/style.min.css" /> -->
+<!-- /VS코드 작업용입니다. 사용하고지워주세요 -->
+
+<link type="text/css" rel="stylesheet" href="/resources/jsgrid/jsgrid.min.css" />
+<link type="text/css" rel="stylesheet" href="/resources/jsgrid/jsgrid-theme.min.css" />
+
+<script type="text/javascript" src="/resources/jsgrid/jsgrid.min.js"></script>
+
+<form id="excelUploadForm" name="excelUploadForm" enctype="multipart/form-data"method="post" action= "/emp/stuman/stulist/excelupload?${_csrf.parameterName}=${_csrf.token}">
+
+
+				<div class="input-group flex-nowrap">
+					<div class="custom-file" style="width: 200px;">
+						<input class="form-control" type="file" id="excelFile" name="excelFile">
+					</div>
+					<button class="btn btn-outline-secondary" type="button">
+						Excel 일괄 업로드
+					</button>
+				</div>
+
+			<button type="button" class="btn waves-effect waves-light btn-primary" onclick="excelUpload()">엑셀 일괄등록</button>
+
+</form>
+<div class="input-group flex-nowrap">
+	<div class="custom-file w-100">
+		<input class="form-control" type="file" id="formFile">
+	</div>
+	<button class="btn btn-outline-secondary" type="button">
+		Button
+	</button>
+</div>
+
+
+<button id="btnAdd" class="btn waves-effect waves-light btn-primary" type="button" onclick="AddClick()">원생등록</button>
+<div id="jsGrid"></div>
+
+
+
+
+					<!--  Modal content for the above example -->
+					<div class="modal fade" id="resultModal" tabindex="-1" role="dialog"
+							aria-labelledby="myLargeModalLabel" aria-hidden="true">
+							<div class="modal-dialog modal-xl">
+									<div class="modal-content">
+											<div class="modal-header">
+													<h4 class="modal-title" id="myLargeModalLabel">원생등록 엑셀 업로드 결과</h4>
+													<button type="button" class="btn-close" data-bs-dismiss="modal"
+															aria-hidden="true"></button>
+											</div>
+											<div class="modal-body">
+													<div class="container-fluid">
+														<div class="text-center" id="result-text"></div>
+													</div>
+													<div id="resultGrid"></div>
+											</div>
+									</div><!-- /.modal-content -->
+							</div><!-- /.modal-dialog -->
+					</div><!-- /.modal -->
+
+
+
+<script> // 엑셀 POI 업로드
+
+const resultModal = new bootstrap.Modal('#resultModal', {})
+
+function excelUpload() {
+    if(confirm("업로드 여부")) {
+      var options = {
+          success : function(result) {
+                if(result.state=="OK") {
+										Swal.fire({
+											title: '원생등록 성공!',
+											icon: 'success',
+											html: `\${result.successCnt} 건 등록 성공! (실패: \${result.failedCnt} 건)`
+										});
+										console.log("엑셀업로드 성공! 결과값", result.stuList);
+										renderResult(result.stuList);
+										$('#result-text').html(`<b>\{result.successCnt} 건 등록 완료</b> (실패:\${result.failedCnt} 건)`);
+										resultModal.show();
+                } else {
+                    console.log("엑셀 업로드 실패");
+										Swal.fire(
+													'원생등록 실패, 엑셀파일을 확인해주세요!',
+													'error'
+													)
+                }
+            },
+            error : function(request, status, error) {
+                console.log("error");
+                alert("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
+            },
+            type : "POST"
+        };
+        $("#excelUploadForm").ajaxSubmit(options);
+    }
+}
+
+</script>
+
+<script>
+
+var data = {};
+
+getAjaxList();
+
+function getAjaxList() {
+
+$.ajax({
+	url: "/emp/stuman/stulist/getlist?${_csrf.parameterName}=${_csrf.token}",
+	method: "POST",
+	dataType: "json",
+	success: function(result){
+		data = result;
+		console.log(result);
+		renderGrid();
+	},
+	error: function() {
+		alert("ajax 리스트 불러오기 에러");
+	}
+})
+
+}
+
+
+function renderGrid() {
+
+	var typeGender = [
+		{	name: "남", value: "M"},
+		{	name: "여", value: "F"}
+	]
+
+    $("#jsGrid").jsGrid({
+
+    	locale:"ko",
+        width: "100%",
+        height: "580px",
+
+        inserting: true,
+        editing: true,
+        sorting: true,
+        paging: true,
+				pageSize: 20,
+				
+
+        data: data.stuList,
+        controller: {
+        	insertItem: function(item) {
+        		$.ajax({
+							url: "/emp/stuman/stulist/insertstuone?${_csrf.parameterName}=${_csrf.token}",
+							contentType: 'application/json; charset=utf-8',
+							method: "POST",
+							dataType: "json",
+							data: JSON.stringify(item),
+							success: function(result){
+								console.log(result);
+								if(result.resultDB == "OK") {
+									Swal.fire({
+											title: '원생등록 성공!',
+											icon: 'success',
+											html: `[\${result.userName}] 원생<br> 원생번호 <b>\${result.userID}</b>로 등록되었습니다.`
+										});
+									getAjaxList();
+								} else {
+
+									Swal.fire(
+													'원생등록 실패!',
+													'error'
+													)
+									getAjaxList();
+								}
+
+							},
+							error: function() {
+								alert("원생 등록 실패");
+							}
+							})
+        	}
+        },
+
+
+        fields: [
+            { name: "svlfNo", title: "연수과정", type: "select", items: data.svlfList, valueField: "svlfNo", textField: "svlfNm", width: 100, validate: "required" },
+            { name: "stuNo", title: "원생번호", type: "text", width: 70, align: "center" , insertTemplate : function() {
+var $result = jsGrid.fields.text.prototype.insertTemplate.apply(this, arguments);
+$result.attr("placeholder", "미입력시 자동생성");
+return $result;
+} },
+            { name: "userNm", title: "이름", type: "text", width: 40 , align: "center" , validate: "required" },
+            { name: "userGender", title: "성별", type: "select", items: typeGender, valueField: "value", textField: "name", width: 30},
+            { name: "userBrdt", title: "생년월일",type: "text", width: 40 , align: "center", validate: "required" },
+            { name: "userPhoneno", title: "연락처",type: "text" , width: 50 , align: "center", validate: "required" },
+            { type: "control", width: 30}
+
+
+        ]
+    });
+
+	
+
+}
+
+function renderResult(resData) {
+
+var typeGender = [
+	{	name: "남", value: "M"},
+	{	name: "여", value: "F"}
+]
+
+	$("#resultGrid").jsGrid({
+
+		locale:"ko",
+			width: "100%",
+			height: "400px",
+
+			inserting: false,
+			editing: false,
+			sorting: true,
+			paging: true,
+			
+
+			data: resData,
+			fields: [
+					{ name: "svlfNo", title: "연수과정", type: "select", items: data.svlfList, valueField: "svlfNo", textField: "svlfNm", width: 100, validate: "required" },
+					{ name: "stuNo", title: "원생번호", type: "text", width: 70, align: "center" },
+					{ name: "userNm", title: "이름", type: "text", width: 40 , align: "center" , validate: "required" },
+					{ name: "userGender", title: "성별", type: "select", items: typeGender, valueField: "value", textField: "name", width: 30},
+					{ name: "userBrdt", title: "생년월일",type: "text", width: 40 , align: "center", validate: "required" },
+					{ name: "userPhoneno", title: "연락처",type: "text" , width: 50 , align: "center", validate: "required" },
+					{ name: "insertSuccess", title: "등록성공여부", type: "text", width: 30}
+
+
+			]
+	});
+
+
+
+}
+
+
+function AddClick() {
+	  if ($('.jsgrid-insert-row').css('display') == "none") {
+	    //Add 버튼 보이기, Show Add Button
+	    $('.jsgrid-insert-row').css({ display: 'table-row' });
+	    $('#btnAdd').text('Close');
+	    return false;
+	  }
+
+	  if ($('.jsgrid-insert-row').css('display') == "table-row") {
+	    //Add 버튼 숨기기, Hide Add Button
+	    $('.jsgrid-insert-row').css({ display: 'none' });
+	    $('#btnAdd').text('Add User');
+	    return false;
+	  }
+	}
+</script>

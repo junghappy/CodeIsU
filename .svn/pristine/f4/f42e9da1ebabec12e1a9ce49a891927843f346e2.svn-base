@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="team.tttt.pms.project.alarm.mapper.AlarmMapper">
+
+<insert id="saveAlarm" parameterType="AlarmVO">
+ 	insert into
+		TB_ALARM(
+		    ALARM_NO
+		    , STU_NO
+		    , ALARM_CN
+		    , ALARM_CD
+		    , ALARM_DT
+		    , ALARM_CHECK_CD
+		    , PROJ_NO)
+		values(
+		   seq_alarm.nextval, 'S2301201',#{alarmCn},#{alarmCd},sysdate,'N',#{projNo}
+		    )
+
+
+</insert>
+
+
+
+
+
+
+</mapper>

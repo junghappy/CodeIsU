@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+   <settings>
+      <setting name="mapUnderscoreToCamelCase" value="true"/>
+   </settings>
+
+   <typeAliases>
+<!--       <typeAlias type="클래스명(패키지구조를 포함한)" alias="별칭명"/> -->
+<!--       <typeAlias type="team.tttt.pms.xxxx" alias="board"/> -->
+
+<!-- K.T -->
+      <typeAlias type="team.tttt.webapp.vo.UserVO" alias="userVO"/>
+      <typeAlias type="team.tttt.webapp.vo.UserRoleVO" alias="userRoleVO"/>
+      <typeAlias type="team.tttt.webapp.vo.DDITMemberAuthVO" alias="dditmemberAuthVO"/>
+      <typeAlias type="team.tttt.webapp.vo.DDITMemberVO" alias="dditmemberVO"/>
+      <typeAlias type="team.tttt.webapp.vo.QstnVO" alias="qstnVO"/>
+
+<!-- S.W -->
+      <typeAlias type="team.tttt.webapp.vo.TaskVO" alias="taskVO"/>
+      <typeAlias type="team.tttt.webapp.vo.ASGVO" alias="asgVO"/>
+      <typeAlias type="team.tttt.webapp.vo.CmCdVO" alias="cmcdVO"/>
+
+<!-- M.J -->
+      <typeAlias type="team.tttt.webapp.vo.MemManagementVO" alias="memManagementVO"/>
+      <typeAlias type="team.tttt.webapp.vo.MemJoinAplyVO" alias="MemJoinAplyVO"/>
+
+<!-- D.H -->
+		<typeAlias type="team.tttt.webapp.vo.HntcVO" alias="hntcVO"/>
+<!-- E.J -->
+
+   </typeAliases>
+</configuration>

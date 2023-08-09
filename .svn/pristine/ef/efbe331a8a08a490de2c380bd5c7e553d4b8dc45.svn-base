@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<mapper namespace="team.tttt.pms.stu.main.mapper.StuMainMapper">
+
+	<select id="projList" parameterType="String" resultType="ProjListVO">
+		SELECT B.PROJ_NM
+		FROM TB_PRO_MEM A
+		JOIN TB_PROJ B ON A.PROJ_NO = B.PROJ_NO
+		WHERE
+		A.STU_NO = #{stuNo}
+	</select>
+
+</mapper>

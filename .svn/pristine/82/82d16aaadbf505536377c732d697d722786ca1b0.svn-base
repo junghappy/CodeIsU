@@ -1,0 +1,51 @@
+package team.tttt.webapp.pms.task.service;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import team.tttt.webapp.mapper.ProjectTaskMapper;
+import team.tttt.webapp.vo.TaskVO;
+
+
+@Service
+public class ProjectTaskServiceImpl implements ProjectTaskService {
+
+	@Inject
+	private ProjectTaskMapper mapper;
+
+	@Override
+	public int insertUpperTask(TaskVO taskVO) {
+		return mapper.insertUpperTask(taskVO);
+	}
+
+	@Override
+	public int insertLowerTask(TaskVO taskVO) {
+		return mapper.insertLowerTask(taskVO);
+	}
+
+	@Override
+	public List<TaskVO> TaskList(String projNo) {
+		return mapper.TaskList(projNo);
+	}
+
+	@Override
+	public TaskVO taskDetail(String taskNo) {
+		return mapper.taskDetail(taskNo);
+	}
+
+	@Override
+	public int taskDelete(String taskNo) {
+		return mapper.taskDelete(taskNo);
+	}
+
+	@Override
+	public int taskUpdate(TaskVO taskVO) {
+		return mapper.taskUpdate(taskVO);
+	}
+
+
+
+}

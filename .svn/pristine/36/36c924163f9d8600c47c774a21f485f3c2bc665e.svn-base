@@ -1,0 +1,44 @@
+package team.tttt.pms.project.gantt.web;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import lombok.extern.slf4j.Slf4j;
+import team.tttt.pms.project.task.service.ProjectTaskService;
+import team.tttt.pms.project.task.web.ProjectTaskController;
+import team.tttt.pms.project.vo.TaskVO;
+
+@RequestMapping("/pms/project")
+@Slf4j
+@Controller
+public class PmsGanttController {
+
+	@Inject
+	private ProjectTaskService service;
+
+	@GetMapping("/gantt")
+	public String getTaskList() {
+		return "pms/com/taskGantt";
+	}
+
+
+	// 업무 출력
+	@GetMapping("/ganttTask")
+	@ResponseBody
+	public List<TaskVO> getTaskList(String projNo) {
+
+		System.out.println("-----------------[" + projNo + "]--------------------");
+		List<TaskVO> taskList = service.taskList(projNo);
+		log.info(taskList.size() + "");
+
+		return taskList;
+	}
+
+}

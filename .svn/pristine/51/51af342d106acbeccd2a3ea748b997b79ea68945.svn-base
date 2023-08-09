@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.webapp.mapper.MemManagementMapper">
+
+<select id="list" resultType="memManagementVO" parameterType="String">
+<!-- 	SELECT *
+		FROM (
+		    SELECT b.user_nm, team_join_dt, b.user_eml_addr, a.jbttl_cd, b.user_phoneno, a.proj_no
+		    FROM pro_mem a
+		    JOIN stu b ON a.stu_no = b.stu_no
+		) c
+	WHERE c.proj_no = 'a001' -->
+          SELECT stu_no, user_eml_addr, team_join_dt,  jbttl_cd,  proj_no
+          FROM pro_mem
+          WHERE proj_no = #{projNo}
+</select>
+</mapper>

@@ -1,0 +1,38 @@
+package team.tttt.pms.emp.kalleave.service.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import team.tttt.pms.emp.kalleave.mapper.KalleaveMapper;
+import team.tttt.pms.emp.kalleave.service.KalleaveService;
+import team.tttt.pms.stu.vo.AttdanVO;
+
+@Service
+public class KalleaveServiceImpl implements KalleaveService {
+
+	@Inject
+	private KalleaveMapper kalleaveMapper;
+
+	@Override
+	public List<AttdanVO> attdanAllList() {
+		return kalleaveMapper.attdanAllList();
+	}
+
+	@Override
+	public List<AttdanVO> attdanapproval() {
+		return kalleaveMapper.attdanapproval();
+	}
+
+	@Override
+	public List<AttdanVO> attdanunapproved() {
+		return kalleaveMapper.attdanunapproved();
+	}
+
+	@Override
+	public int approvalUpdate(AttdanVO attdanVO) {
+		return kalleaveMapper.approvalUpdate(attdanVO);
+	}
+}

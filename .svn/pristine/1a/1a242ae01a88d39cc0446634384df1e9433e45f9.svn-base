@@ -1,0 +1,11 @@
+package team.tttt.webapp.pms.service;
+
+import java.util.List;
+
+import team.tttt.webapp.vo.MemManagementVO;
+
+public interface IMemManagementService {
+
+	public List<MemManagementVO> list(String projNo);
+
+}

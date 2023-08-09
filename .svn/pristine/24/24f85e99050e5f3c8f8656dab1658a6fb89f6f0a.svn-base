@@ -1,0 +1,246 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<style>
+.ImgStuNoQstnDtBox {
+    margin-bottom: 20px;
+    height: 40px;
+}
+.ImgStuNoQstnDtBox .stuNoQstnDt{
+    top: 1px;
+    left: 50px;
+
+}
+.ImgStuNoQstnDtBox .stuNoQstnDt .stuNo{
+    font-size: 14px;
+    font-weight: 600px;
+}
+.ImgStuNoQstnDtBox .stuNoQstnDt .qstnDt{
+    font-size: 12px;
+}
+
+.dropdown{
+	top : 0px;
+	right: 0px;
+}
+.style-none{
+	border: none;
+	background-color: white;
+	color:none;
+	color: white;
+}
+.cardHeight{
+	height: 95.990px;
+}
+/*
+.my-transform{
+	transform: translate3d(-142px, 29.6667px, 0px);
+
+} */
+
+</style>
+<div class="container">
+	<input type="hidden" id="sbjctCd" value="${sbjctCd}">
+
+	<div class="accordion mb-2" id="accordionExample">
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingOne">
+				<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+					<img alt="" src="">
+					<span>질문을 입력하세요</span>
+				</button>
+			</h2>
+			<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+				<div class="accordion-body">
+					<form action="/stu/classroom/qstn?${_csrf.parameterName }=${_csrf.token}" method="post" id="qstnForm">
+						<input type="hidden" id="editorInput" name="editorInput">
+						<div id="editor"></div>
+						<div class="text-end">
+							<button type="button" class="btn btn-secondary" id="btn" >등록</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="accordion" id="qstnListContainer">
+
+	<!--모달-->
+	<div class="modal" tabindex="-1" id="myModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+				<h5 class="modal-title">Modal title</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+				</div>
+				<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary">Save changes</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.css"/>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+	var sbjctCd = document.querySelector("#sbjctCd").value;
+	var qstnListContainer = document.querySelector("#qstnListContainer");
+	qstnLIst()
+	// 에디터 생성
+	const Editor = toastui.Editor;
+	const editor = new Editor({
+		el: document.querySelector('#editor'),
+		toolbarItems: [ // 사용할 기능 커스텀 - 파일업로드 삭제
+		['heading', 'bold', 'italic', 'strike'],
+		['hr', 'quote'],
+		['ul', 'ol', 'task', 'indent', 'outdent'],
+		['table', 'code', 'codeblock']
+	],
+	height: '300px',
+	initialEditType: 'wysiwyg',
+	previewStyle: 'vertical'
+	});
+
+
+	// 화면 생성
+	var iNum = 1;
+	function qstnLIst(){
+		console.log("체킁");
+		$.ajax({
+			url: "/stu/classroom/qstnList",
+			method: 'get',
+			data : { "sbjctCd": sbjctCd },
+			dataType: 'json',
+			success: function(res) {
+				console.log("res",res);
+				var qstnListStr = "";
+				if(res == null || res.length == 0){
+					qstnListStr += `<div>`;
+					qstnListStr += `    <p>조회하실 게시물이 존재하지 않습니다.</p>`;
+					qstnListStr += `</div>`;
+				} else {
+					res.forEach(function(myQstnList) {
+						let qstnCn = sliceText(myQstnList.qstnCn, 80);
+						qstnListStr += `<div class="card qstnListCard">`
+						qstnListStr += `	<input type="hidden" class="qstnCn" value="${qstnCn}">`
+						qstnListStr += `    <div class="card-body collapse show">`
+						qstnListStr += `		<div class="row">`
+						qstnListStr += `			<div class="col-1"><img src="${pageContext.request.contextPath}<sec:authentication property='principal.member.userProfile'/>" alt="user" class="rounded-circle profile" width="40"></div>`
+						qstnListStr += `			<div class="col-3 userNm">\${myQstnList.userNm}</div>`
+						qstnListStr += `			<div class="col-8 text-end qstDt">\${myQstnList.qstnDt}</div>`
+						qstnListStr += `		</div>`
+						qstnListStr += `		<div class="row cardHeight">`
+						qstnListStr += `        	<p>\${qstnCn}</p>`
+						qstnListStr += `		</div>`
+
+						qstnListStr += `		<div class="row">`
+					    if(!myQstnList.qstnAns){
+							qstnListStr += `        <div class="col-1 d-flex align-items-center">댓글</div>`
+							qstnListStr += `        <div class="col-11 border border-dark p-2">댓글이 등록되지 않았습니다</div>`
+					    } else {
+							qstnListStr += `        <div class="col-1 d-flex align-items-center">댓글</div>`
+							qstnListStr += `        <div class="col-11 border border-dark p-2">\${myQstnList.qstnAns}</div>`
+					    }
+						qstnListStr += `		</div>`
+						qstnListStr += `    </div>`
+						qstnListStr += `</div>`
+
+					})
+				}
+				qstnListContainer.innerHTML = qstnListStr;
+			},
+			error: function(xhr, status, error) {
+			// 요청이 실패했을 때 처리할 코드 작성
+			console.error('Request failed. Status:', status);
+			}
+		});
+
+	}
+
+	// 등록
+	var btn = document.querySelector("#btn");
+	btn.addEventListener("click", function () {
+		let editorData = editor.getHTML();
+		var csrfParameterName = '${_csrf.parameterName}';
+		var csrfToken = '${_csrf.token}';
+		console.log("과목코드 : ${sbjctCd}");
+		$.ajax({
+			url: '/stu/classroom/qstn?' + csrfParameterName + '=' + csrfToken,
+			method: 'post',
+			data: {
+			"qstnCn":editorData,
+			"sbjctCd":sbjctCd
+			},
+			dataType: 'json',
+			success: function(response) {
+				console.log(response);
+				var collapseOne = document.querySelector('#collapseOne');
+				collapseOne.classList.remove('show');
+				collapseOne.setAttribute('aria-expanded', 'false');
+			},
+			error: function(xhr, status, error) {
+			// 요청이 실패했을 때 처리할 코드 작성
+			console.error('Request failed. Status:', status);
+			}
+		});
+	})
+
+	function sliceText(text, maxLength) {
+		// 줄바꿈 문자를 <br> 태그로 변경
+		if (text.length > maxLength) {
+			return text.slice(0, maxLength) + '...';
+		}
+		return text;
+	}
+
+	var modal = new bootstrap.Modal('#myModal', {});
+
+
+	// 수정 삭제 모달
+	$(document).on("click", ".qstnListCard", function(e) {
+		alert("클릭함");
+		modal.show();
+		// 토스트 api에 넣을 값
+		let myQstnCn = $(this).find(".qstnCn").val();
+		let profile = $(this).find(".profile").clone();;
+		let userNm = $(this).find(".userNm").text();
+		let qstnDt = $(this).find(".qstnDt").text();
+		console.log("myQstnCn", myQstnCn);
+		console.log("userNm", userNm);
+		console.log("qstnDt", qstnDt);
+
+		var modalBody = document.querySelector(".modal-body");
+
+
+		let modalBodyStr = "";
+		modalBodyStr += `<div class="row">`;
+		modalBodyStr += `	<div class="col-1">\${profile.prop('outerHTML')}</div>`;
+		modalBodyStr += `	<div class="col-3">\${userNm}</div>`;
+		modalBodyStr += `	<div class="col-8 text-end">\${qstnDt}</div>`;
+		modalBodyStr += `<div>`;
+		modalBodyStr += `<div class="row">`;
+		modalBodyStr += `	<div id="modifyEditor"></div>`;
+		modalBodyStr += `</div>`;
+		modalBody.innerHTML = modalBodyStr;
+		const modifyeditor = new Editor({
+			el: document.querySelector('#modifyEditor'),
+			toolbarItems: [ // 사용할 기능 커스텀 - 파일업로드 삭제
+			['heading', 'bold', 'italic', 'strike'],
+			['hr', 'quote'],
+			['ul', 'ol', 'task', 'indent', 'outdent'],
+			['table', 'code', 'codeblock']
+			],
+			height: '300px',
+			initialEditType: 'wysiwyg',
+			previewStyle: 'vertical'
+		});
+		modifyeditor.setHTML(myQstnCn);
+
+
+	})
+
+
+</script>

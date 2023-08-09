@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.pms.stu.resume.mapper.ResumeMapper">
+
+	<insert id="tbResumeInsert" parameterType="ResumeVO" useGeneratedKeys="true">
+		<selectKey keyProperty="resumeNo" resultType="String" order="BEFORE">
+			SELECT 'R'||TO_CHAR(SYSDATE, 'YYMMDD')||LPAD(SEQ_TB_RESUME.NEXTVAL,4,0) FROM DUAL
+		</selectKey>
+	INSERT INTO TB_RESUME (
+	    RESUME_NO
+	    , STU_NO
+	    , RESUME_NM
+	    , ATCH_FILE_NO
+	    , HIGHSCH_NM
+	    , HIGHSCH_TYPE
+	    , HIGHSCH_GRDTN_YM
+	    , RESUME_INTRO_CONN
+	    , REG_DT
+	    )
+	VALUES (
+	    #{resumeNo}
+	    , #{stuNo}
+	    , #{resumeNm}
+	    , #{atchFileNo}
+	    , #{highschNm}
+	    , #{highschType}
+	    , #{highschGrdtnYm}
+	    , #{resumeIntroConn}
+	    , SYSDATE
+		)
+
+	</insert>
+
+	<insert id="tbAcbgInsert" parameterType="ResAcbgInfoVO">
+	INSERT INTO TB_ACBG_INFO (
+	    RESUME_NO
+	    , ACBG_NO
+	    , SCHL_SE_CD
+	    , SCHL_NM
+	    , DEPART_NM
+	    , MTCLTN_YM
+	    , GRDTN_YM
+	    , GRDTN_STATE
+	    , SCHL_CREDIT
+	    )
+	    VALUES (
+	    #{resumeNo}
+	    , #{acbgNo}
+	    , #{schlSeCd}
+	    , #{schlNm}
+	    , #{departNm}
+	    , #{mtcltnYm}
+	    , #{grdtnYm}
+	    , #{grdtnState}
+	    , #{userCredit}||'/'||#{baseCredit}
+	    )
+	</insert>
+
+	<insert id="tbCrtfctInsert" parameterType="ResCrtfctInfoVO">
+	INSERT INTO TB_CRTFCT_INFO (
+	    CRTFCT_NO
+		, RESUME_NO
+		, CRTFCT_NM
+		, ISSU_INST_NM
+		, CRTFCT_DT
+		) VALUES (
+		#{crtfctNo}
+		, #{resumeNo}
+		, #{crtfctNm}
+		, #{issuInstNm}
+		, #{crtfctDt}
+		)
+	</insert>
+
+	<insert id="tbCareerInsert" parameterType="ResCareerInfoVO">
+	INSERT INTO TB_CAREER_INFO  (
+		CAREER_NO
+		, RESUME_NO
+		, CO_NM
+		, JNCMP_YM
+		, RSGNTN_YM
+		, DEPT_NM
+		, JBGD_NM
+		, HDOF_YN
+		) VALUES (
+		#{careerNo}
+		, #{resumeNo}
+		, #{coNm}
+		, #{jncmpYm}
+		, #{rsgntnYm}
+		, #{deptNm}
+		, #{jbgdNm}
+		, #{hdofYn}
+	)
+	</insert>
+
+	<insert id="tbTechInsert" parameterType="ResTechInfoVO">
+	INSERT INTO TB_TECH_INFO  (
+		TECH_NO
+		, RESUME_NO
+		, TECH_NM
+		, SKILL_LEVEL
+		) VALUES (
+		#{techNo}
+		, #{resumeNo}
+		, #{techNm}
+		, #{skillLevel}
+	)
+	</insert>
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

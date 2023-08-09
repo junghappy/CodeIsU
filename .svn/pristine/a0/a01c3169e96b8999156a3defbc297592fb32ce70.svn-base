@@ -1,0 +1,44 @@
+package team.tttt.pms.emp.stulist.service.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import team.tttt.pms.common.enums.ServiceResult;
+import team.tttt.pms.emp.stulist.mapper.StuListMapper;
+import team.tttt.pms.emp.stulist.service.StuListService;
+import team.tttt.pms.emp.vo.SvlfVO;
+import team.tttt.pms.stu.vo.StuVO;
+
+@Service
+public class StuListServiceImpl implements StuListService {
+
+	@Inject
+	StuListMapper stuListMapper;
+
+	@Override
+	public List<StuVO> getStuListAll() {
+		return stuListMapper.getStuListAll();
+	}
+
+	@Override
+	public List<SvlfVO> getSvlfAll() {
+		return stuListMapper.getSvlfAll();
+	}
+
+	@Override
+	public ServiceResult insertStuOne(StuVO stuVO) {
+
+		if (stuVO.getStuNo() == null) {
+			String slvf = stuVO.getSvlfNo();
+
+
+		}
+
+		int cnt = stuListMapper.insertStuOne(stuVO);
+		return null;
+	}
+
+}

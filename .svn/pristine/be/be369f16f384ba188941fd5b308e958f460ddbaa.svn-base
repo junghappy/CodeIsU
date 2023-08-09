@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="/CodeIsU/src/main/java/team/tttt/webapp/mapper/classroom/StuQstnMapper">
+    <insert id="insertQstn" parameterType="qstnVO">
+        <selectKey keyProperty="qstnNo" resultType="int" order="BEFORE">
+              SELECT SEQ_TB_QSTN.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_QSTN(
+              QSTN_NO
+            , QSTN_CN
+            , QSTN_DT
+            , STU_NO)
+        VALUES (
+              #{qstnNo}
+            , #{qstnCn}
+            , sysdate
+            , #{stuNo}
+        )
+    </insert>
+
+    <select id="selectQstnList" resultType="qstnVO">
+        SELECT
+              QSTN_NO
+            , QSTN_CN
+            , QSTN_DT
+            , QSTN_ANS
+            , QSTN_ANS_DT
+            , EMP_NO
+            , STU_NO
+        FROM TB_QSTN
+        ORDER BY QSTN_DT
+    </select>
+</mapper>

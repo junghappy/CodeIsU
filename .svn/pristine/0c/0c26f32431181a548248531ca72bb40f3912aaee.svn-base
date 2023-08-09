@@ -1,0 +1,55 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib  uri="http://www.springframework.org/security/tags" prefix="sec"%>
+
+<h1>공지사항 페이지</h1>
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>번호</th>
+			<th>제목</th>
+			<th>작성일</th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:set value="${hntcList }" var="hntcList"/>
+		<c:choose>
+			<c:when test="${empty hntcList }">
+				<tr>
+					<td colspan="3">조회할 게시물이 없습니다.</td>
+				</tr>
+			</c:when>
+			<c:otherwise>
+				<c:forEach items="${hntcList }" var="hntc">
+					<tr>
+						<td>${hntc.hntcNo }</td>
+						<td>
+							<a href="/emp/hntc/hntcDetail?bono=${hntc.hntcNo }">
+								${hntc.hntcNm }
+							</a>
+						</td>
+						<td>${hntc.hntcDt }</td>
+					</tr>
+				</c:forEach>
+			</c:otherwise>
+		</c:choose>
+	</tbody>
+</table>
+<div>
+	<button type="button" class="btn btn-primary" id="insertHntc">글 등록</button>
+</div>
+
+
+<script type="text/javascript">
+$(function(){
+	var insertHntc = $("#insertHntc");
+
+	insertHntc.on("click", function(){
+		location.href = "/emp/hntc/hntcForm"
+	})
+
+})
+
+</script>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.webapp.mapper.HntcMapper">
+
+	<insert id="hntcInsert" parameterType="hntcVO">
+		insert into tb_hntc(
+			HNTC_NO, EMP_NO, HNTC_NM, HNTC_DT,HNTC_CN
+		)values(
+			'HN'||SEQ_HNTC.NEXTVAL, #{empNo}, #{hntcNm}, sysdate, #{hntcCn}
+		)
+	</insert>
+
+	<select id="selectHntc" resultType="hntcVO">
+		select HNTC_NO, HNTC_NM, HNTC_DT
+		from TB_HNTC
+		ORDER BY HNTC_NO DESC
+	</select>
+
+	<select id="detailHntc" parameterType="String" resultType="hntcVO">
+		select *
+		from TB_HNTC
+		where HNTC_NO = #{boNo}
+	</select>
+
+	<delete id="hntcDel" parameterType="String">
+		delete from TB_HNTC
+		where HNTC_NO = #{boNo}
+	</delete>
+
+	<update id="updateHntc" parameterType="hntcVO">
+		update TB_HNTC
+		set
+			HNTC_NM = #{hntcNm},
+			HNTC_CN = #{hntcCn},
+			HNTC_DT = sysdate
+		where HNTC_NO = #{hntcNo}
+	</update>
+</mapper>

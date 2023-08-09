@@ -1,0 +1,47 @@
+package team.tttt.webapp.vo;
+
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class UserVO {
+	private String userNo;
+	private String userPswd;
+	private String userProfile;
+	private List<UserRoleVO> authList;
+	private String enabled;
+	private String userType;
+
+	private String stuNo;
+	private String userNm;
+	private String userEmlAddr;
+	private String userPhoneno;
+	private String userAddr;
+	private String userDaddr;
+	private String regDt;
+	private String userPrvcYn;
+
+}
+
+
+//userNo
+//userPswd
+//userProfile
+//ENABLED
+//userType
+//stuNo
+//userNm
+//userEmlAddr
+//userPhoneno
+//userAddr
+//userDaddr
+//regDt
+//fnshDt
+//fnshYn
+//abdYn
+//joinDt
+//userPrvcYn
+//
+//userNo
+//arthCd

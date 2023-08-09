@@ -1,0 +1,26 @@
+/**
+ *
+ */
+function getCode(cdTypeId, insertLocation) {
+  $.ajax({
+    url: "/cmCd/selectCode",
+    data: {
+      cdTypeId: cdTypeId,
+    },
+    type: "get",
+    dataType: "json",
+    success: function (res) {
+      console.log("넘어온 공통 코드 : ", res);
+      console.log("팀원", res);
+      let commonCode = "";
+      for (let i = 0; i < res.length; i++) {
+        commonCode += `<option value=${res[i].cdTypeId}-${res[i].cdVl}>${res[i].cdNm}</option>`;
+      }
+      console.log("공통코드 options : " + commonCode);
+      $("#" + insertLocation).html(commonCode);
+    },
+    error: function (xhr) {
+      console.log("getTeamMemList 상태: " + xhr.status);
+    },
+  });
+}

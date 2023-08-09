@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.webapp.mapper.MemManagementMapper">
+
+<!-- 멤버관리  -->
+<select id="memList" resultType="memManagementVO" parameterType="String">
+SELECT
+B.STU_NO
+, B.USER_EML_ADDR
+, A.TEAM_JOIN_DT
+, B.USER_PHONENO
+, A.JBTTL_CD
+FROM TB_PRO_MEM A
+JOIN TB_STU B ON A.STU_NO = B.STU_NO
+WHERE A.PROJ_NO='a001'
+</select>
+
+<update id="positionModify" parameterType="String">
+UPDATE TB_PRO_MEM
+SET
+JBTTL_CD = #{jbttlCd}
+WHERE
+STU_NO = #{stuNo}
+</update>
+
+<select id="memJoinAplyList" resultType="MemJoinAplyVO" parameterType="String">
+SELECT
+B.USER_NM, A.APPLY_DATE
+FROM TB_JOIN_APLY A
+JOIN TB_STU B ON A.STU_NO = B.STU_NO
+WHERE A.PROJ_NO = 'a001'
+</select>
+</mapper>

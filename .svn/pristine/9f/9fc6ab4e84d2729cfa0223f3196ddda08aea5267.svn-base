@@ -1,0 +1,210 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<script
+  src="https://code.jquery.com/jquery-3.7.0.min.js"
+  integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+  crossorigin="anonymous"
+></script>
+
+<style>
+  .task {
+    background-color: #f4f2f2;
+  }
+  .taskCn {
+    background-color: #f4f2f2;
+  }
+
+  .msubBtn {
+    background-color: #56726a;
+    color: white;
+  }
+  .mcanBtn {
+    border: 1px solid gray;
+  }
+</style>
+
+<br />
+<div class="card-body" id="calendar"></div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="taskInsertModal"
+  role="dialog"
+  aria-labelledby="taskInsertModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog d-flex justify-content-center" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-normal" id="taskInsertModalLabel">
+          일감 등록하기
+        </h5>
+      </div>
+
+      <div class="modal-body">
+        <form>
+          <label class="form-label" for="taskTitle">제목</label>
+          <input
+            type="text"
+            id="taskTitle"
+            name="taskTitle"
+            class="form-control task"
+          />
+
+          <label class="form-label" for="taskStts" class="ms-0">상태</label>
+          <select class="form-select task" id="taskStts" name="taskStts">
+            <option value="대기" selected>"대기"</option>
+            <option value="진행">진행</option>
+            <option value="완료">완료</option>
+            <option value="지연">지연</option>
+          </select>
+
+          <label class="form-label" for="taskPic">담당자</label>
+          <input
+            type="text"
+            name="taskPic"
+            id="taskPic"
+            class="form-control task"
+          />
+
+          <label class="form-label" for="taskBengDt">시작날짜</label>
+          <input
+            type="date"
+            name="taskBengDt"
+            id="taskBengDt"
+            class="form-control task"
+          />
+
+          <label class="forms-label" for="taskDdlnDt">종료날짜</label>
+          <input
+            type="date"
+            id="taskDdlnDt"
+            name="taskDdlnDt"
+            class="form-control task"
+          />
+
+          <label class="form-label" for="taskPriority">우선순위</label>
+          <select
+            class="form-select task"
+            id="taskPriority"
+            name="taskPriority"
+            aria-label="Default select example"
+          >
+            <option value="낮음" selected>낮음</option>
+            <option value="보통">보통</option>
+            <option value="긴급">긴급</option>
+          </select>
+
+          <label class="form-label" for="taskCn">내용</label>
+          <textarea
+            class="form-control taskCn"
+            id="taskCn"
+            name="taskCn"
+          ></textarea>
+
+          <div class="modal-footer">
+            <button type="button" class="btn bg msubBtn">등록</button>
+            <button
+              type="button"
+              class="btn bg mcanBtn"
+              data-bs-dismiss="modal"
+            >
+              닫기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "dayGridMonth",
+      nowIndicator: true,
+      dayMaxEvents: true,
+      editable: true,
+      selectable: true,
+      selectMirror: true,
+      select: function (arg) {
+        $("#taskInsertModal").modal("show");
+
+        /*     	  var title = prompt('제목을 입력하세요:');
+          var backgroundColor = prompt('바탕색을 입력하세요(영어로):');
+          var textColor = prompt('글자색을 입력하세요(영어로)'); */
+
+        if (title) {
+          calendar.addEvent({
+            taskTitle: title,
+            taskBengDt: arg.start,
+            taskDdlnDt: arg.end,
+            allDay: arg.allDay,
+            backgroundColor: backgroundColor,
+            textColor: textColor,
+          });
+
+          var start = arg.start;
+          var end = arg.end;
+          var allDay = arg.allDay;
+          var backgroundColor = backgroundColor;
+          var textColor = textColor;
+          $.ajax({
+            type: "get",
+            contentType: "application/json",
+            url: "/task/insert.do",
+            data: {
+              title: title,
+              backgroundColor: backgroundColor,
+              textColor: textColor,
+              start: start,
+              end: end,
+              allDay: allDay,
+            },
+            success: function (res) {
+              console.log("DB 삽입 성공");
+            },
+            dataType: "json",
+          });
+        }
+        calendar.unselect();
+      },
+      eventClick: function (arg) {
+        if (confirm("일정을 삭제하시겠습니까??")) {
+          arg.event.remove();
+        }
+      },
+      eventDrop: function (arg) {
+        alert("드랍앤드롭");
+      },
+      eventResize: function (arg) {
+        alert("리사이징");
+      },
+
+      /*      events: function(info, successCallback, failureCallback){
+          var start;
+          var end;
+          var allDay;
+          var backgroundColor;
+          var textColor;
+          var title;
+
+    	  $.ajax({
+    		 type:"get",
+    		 url:"/calendar/chogi",
+    		dataType:"json"
+    	  });
+      }, */
+      headerToolbar: {
+        left: "prev,next",
+        center: "title",
+        right: "dayGridMonth,dayGridWeek,dayGridDay,dayGridYear",
+      },
+    });
+    calendar.render();
+  });
+</script>

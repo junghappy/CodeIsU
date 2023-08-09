@@ -1,0 +1,44 @@
+package team.tttt.pms.project.Issue.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import team.tttt.pms.common.vo.UserVO;
+import team.tttt.pms.project.vo.AlarmVO;
+import team.tttt.pms.project.vo.CmntVO;
+import team.tttt.pms.project.vo.IssueVO;
+import team.tttt.pms.project.vo.PaginationInfoVO;
+
+@Mapper
+public interface PmsIssueMapper {
+
+	int selectBoardCount(PaginationInfoVO<IssueVO> pagingVO);
+
+	List<IssueVO> getIssueList(PaginationInfoVO<IssueVO> pagingVO);
+
+	int insertIssue(IssueVO issueVO);
+
+	IssueVO Detail(String issueNo);
+
+	int update(IssueVO issueVO);
+
+	int del(IssueVO issueVO);
+
+	int insertComment(CmntVO cmntVO);
+
+	CmntVO detailComment(String cmntNo);
+
+	int updateCommnet(CmntVO cmntVO);
+
+	int deleteCommnet(CmntVO cmntNo);
+
+	List<CmntVO> cmntDetail(String issueNo);
+
+	int insertAlarm(AlarmVO alarmVO);
+
+	List<UserVO> selectUserNoList(String projNo);
+
+
+
+}

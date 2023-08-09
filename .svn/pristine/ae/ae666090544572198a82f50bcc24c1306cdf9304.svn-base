@@ -1,0 +1,11 @@
+package team.tttt.pms.project.kanban.service;
+
+import java.util.Map;
+
+import team.tttt.pms.common.enums.ServiceResult;
+
+public interface PmsKanbanService {
+
+	ServiceResult moveBoard(Map<String, Object> moveBoard);
+
+}

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.pms.emp.kalleave.mapper.KalleaveMapper">
+
+	<!-- 아직 승인하지 않은 조퇴 외출 목록 가져오기 -->
+	<select id="attdanAllList" resultType="AttdanVO">
+	<!-- team.tttt.pms.emp.kalleave.mapper.KalleaveMapper.attdanAllList -->
+	SELECT
+    A.ATTDAN_NO
+    , A.STU_NO
+    , A.ATTDAN_WRITE_DT
+    , A.ATTDAN_DT
+    , A.ATTDAN_BGNG
+    , A.ATTDAN_DDLB
+    , A.ATTDAN_CD
+    , A.ATTDAN_APPROVAL
+    , A.ATTDAN_CN
+    , B.USER_NM
+    , C.CD_NM
+	FROM TB_ATTDAN A
+	LEFT OUTER JOIN TB_STU B ON A.STU_NO = B.STU_NO
+	LEFT OUTER JOIN TB_CM_CD C on C.CD_TYPE_ID = SUBSTR(A.ATTDAN_CD, 1, INSTR(A.ATTDAN_CD, '-') -1)
+	                                            AND C.CD_VL = SUBSTR(A.ATTDAN_CD, INSTR(A.ATTDAN_CD, '-') + 1)
+	                                            AND C.CD_TYPE_ID = 'S001'
+	                                            AND C.CD_C_USE_YN = 'Y'
+	WHERE ATTDAN_APPROVAL IS NULL
+	ORDER BY ATTDAN_NO ASC
+	</select>
+
+	<!-- 승인한 조퇴 외출 목록 가져오기 -->
+	<select id="attdanapproval" resultType="AttdanVO">
+	<!-- team.tttt.pms.emp.kalleave.mapper.KalleaveMapper.attdanapproval -->
+	SELECT
+    A.ATTDAN_NO
+    , A.STU_NO
+    , A.ATTDAN_WRITE_DT
+    , A.ATTDAN_DT
+    , A.ATTDAN_BGNG
+    , A.ATTDAN_DDLB
+    , A.ATTDAN_CD
+    , A.ATTDAN_APPROVAL
+    , A.ATTDAN_CN
+    , B.USER_NM
+    , C.CD_NM
+	FROM TB_ATTDAN A
+	LEFT OUTER JOIN TB_STU B ON A.STU_NO = B.STU_NO
+	LEFT OUTER JOIN TB_CM_CD C on C.CD_TYPE_ID = SUBSTR(A.ATTDAN_CD, 1, INSTR(A.ATTDAN_CD, '-') -1)
+	                                            AND C.CD_VL = SUBSTR(A.ATTDAN_CD, INSTR(A.ATTDAN_CD, '-') + 1)
+	                                            AND C.CD_TYPE_ID = 'S001'
+	                                            AND C.CD_C_USE_YN = 'Y'
+	WHERE ATTDAN_APPROVAL = 'Y'
+	ORDER BY ATTDAN_NO ASC
+	</select>
+
+	<!-- 미승인한 조퇴 외출 목록 가져오기 -->
+	<select id="attdanunapproved" resultType="AttdanVO">
+	<!-- team.tttt.pms.emp.kalleave.mapper.KalleaveMapper.attdanunapproved -->
+	SELECT
+    A.ATTDAN_NO
+    , A.STU_NO
+    , A.ATTDAN_WRITE_DT
+    , A.ATTDAN_DT
+    , A.ATTDAN_BGNG
+    , A.ATTDAN_DDLB
+    , A.ATTDAN_CD
+    , A.ATTDAN_APPROVAL
+    , A.ATTDAN_CN
+    , B.USER_NM
+    , C.CD_NM
+	FROM TB_ATTDAN A
+	LEFT OUTER JOIN TB_STU B ON A.STU_NO = B.STU_NO
+	LEFT OUTER JOIN TB_CM_CD C on C.CD_TYPE_ID = SUBSTR(A.ATTDAN_CD, 1, INSTR(A.ATTDAN_CD, '-') -1)
+	                                            AND C.CD_VL = SUBSTR(A.ATTDAN_CD, INSTR(A.ATTDAN_CD, '-') + 1)
+	                                            AND C.CD_TYPE_ID = 'S001'
+	                                            AND C.CD_C_USE_YN = 'Y'
+	WHERE ATTDAN_APPROVAL = 'N'
+	ORDER BY ATTDAN_NO ASC
+	</select>
+
+	<!-- 조퇴/외출 승인 여부 변경 -->
+	<update id="approvalUpdate" parameterType="AttdanVO">
+	<!-- team.tttt.pms.emp.kalleave.mapper.KalleaveMapper.approvalUpdate -->
+	UPDATE TB_ATTDAN
+	SET
+	    ATTDAN_APPROVAL = #{attdanApproval}
+	WHERE ATTDAN_NO = #{attdanNo}
+	</update>
+
+</mapper>

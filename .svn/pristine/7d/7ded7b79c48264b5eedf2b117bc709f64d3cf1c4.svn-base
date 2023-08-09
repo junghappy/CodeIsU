@@ -1,0 +1,66 @@
+package team.tttt.pms.stu.mypage.web;
+
+import java.util.UUID;
+
+import javax.inject.Inject;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import lombok.extern.slf4j.Slf4j;
+import team.tttt.pms.common.enums.ServiceResult;
+import team.tttt.pms.common.vo.CustomUser;
+import team.tttt.pms.common.vo.UserVO;
+import team.tttt.pms.emp.vo.AttdVO;
+import team.tttt.pms.stu.mypage.service.QrCheckService;
+
+@Slf4j
+@Controller
+public class QrCheckController {
+
+	@Inject
+	QrCheckService service;
+
+	@RequestMapping(value = "/qrcheck/qrcode", method = RequestMethod.GET)
+	public String qrGenPage() {
+		return "/common/qrcheck/qrGenPage";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/qrcheck/reloadQR", method = RequestMethod.POST)
+	public String reloadQrCode() {
+		String uuidToken = "codeisuQRCheck-" + UUID.randomUUID().toString();
+
+		ServiceResult result = service.insertToken(uuidToken);
+
+		if(result == ServiceResult.OK) {
+			return uuidToken;
+		} else {
+			return ServiceResult.FAILED.name();
+		}
+	}
+
+	public String qrCheck() {
+		return "";
+	}
+
+
+	@RequestMapping(value = "/stu/qrattd")
+	public String qrReadPage(Authentication auth, Model model) {
+		// 여기서 slect를 해본다.
+		CustomUser cUser  = (CustomUser) auth.getPrincipal();
+		UserVO userVO = cUser.getMember();
+
+		AttdVO attdVO = service.selectAttdVO(userVO.getUserNo());
+
+		model.addAttribute("attd", attdVO);
+
+		return "/stu/com/qrcheck/qrreadpage";
+
+	}
+
+}

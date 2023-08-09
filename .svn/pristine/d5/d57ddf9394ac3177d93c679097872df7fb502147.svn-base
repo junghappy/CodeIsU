@@ -1,0 +1,67 @@
+package team.tttt.pms.project.alarm;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class AlarmHandler extends TextWebSocketHandler {
+	private static List<WebSocketSession> list = new ArrayList<WebSocketSession>();
+
+	@Override
+	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+		log.info("## 누군가 접속", session);
+		list.add(session);
+		String userNo = getMemId(session);
+		log.info("나의 유저! :  "+ userNo);
+	}
+
+
+	//JSP에서 메세지 받을 때.
+	@Override
+	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+
+		String[] msgData = message.getPayload().split(",");   //getPayload : TextMessage 객체의 페이로드를 문자열 형태로 가져올 수 있음
+
+
+		log.debug("ck:" + msgData + "ck:");
+		if(msgData[0].equals("issue")) {
+			log.debug("이슈 등록");
+			for (WebSocketSession webSocketSession : list) {
+				webSocketSession.sendMessage(new TextMessage("신규 이슈,"+msgData[1]+","+msgData[2]+","+msgData[3]+","+msgData[4]));
+
+			}
+		}else if(msgData[0].equals("task")) {
+			log.debug("지원 신청서 ");
+			for (WebSocketSession webSocketSession : list) {
+				webSocketSession.sendMessage(new TextMessage("새로운 일감,"+msgData[1]+","+msgData[2]+","+msgData[3]+","+msgData[4]));
+			}
+		}else {
+			log.debug("알림 없을 때");
+			for (WebSocketSession webSocketSession : list) {
+				webSocketSession.sendMessage(new TextMessage("새로운 알림이 없습니다."));
+			}
+		}
+	}
+
+	@Override
+	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+		log.info("## 누군가 떠남", session);
+		list.remove(session);
+	}
+
+	public String getMemId(WebSocketSession session) {
+		Map<String,Object> map = session.getAttributes();
+		log.info("멥:"+map);
+		String userNo = (String)map.get("Username");
+		System.out.println("로그인 한 아이디 : " + userNo);
+		return userNo;
+	}
+}

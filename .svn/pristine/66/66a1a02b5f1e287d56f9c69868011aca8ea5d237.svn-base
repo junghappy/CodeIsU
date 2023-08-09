@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.webapp.mapper.MemManagementMapper">
+
+<!-- 멤버관리  -->
+<select id="memList" resultType="memManagementVO" parameterType="String">
+SELECT
+B.STU_NO
+, B.USER_NM
+, B.USER_EML_ADDR
+, A.TEAM_JOIN_DT
+, B.USER_PHONENO
+, A.JBTTL_CD
+FROM TB_PRO_MEM A
+JOIN TB_STU B ON A.STU_NO = B.STU_NO
+WHERE A.PROJ_NO= #{projNo}
+</select>
+
+<update id="positionModify" parameterType="hashMap">
+UPDATE TB_PRO_MEM
+SET
+JBTTL_CD = #{jbttlCd}
+WHERE
+STU_NO = #{stuNo}
+</update>
+
+<select id="memJoinAplyList" resultType="memJoinAplyVO" parameterType="String">
+SELECT
+B.USER_NM, A.APPLY_DATE, B.STU_NO, A.PROJ_NO, A.APLY_CN, A.APLY_TECH
+FROM TB_JOIN_APLY A
+JOIN TB_STU B ON A.STU_NO = B.STU_NO
+WHERE A.PROJ_NO = #{projNo}
+</select>
+
+<select id="memJoinDetail" resultType="memJoinAplyVO" parameterType="hashMap">
+SELECT APLY_CN, APLY_TECH
+FROM TB_JOIN_APLY
+WHERE STU_NO = #{stuNo}
+
+</select>
+
+<insert id="memInsert" parameterType="memManagementVO">
+INSERT INTO TB_PRO_MEM (STU_NO, TEAM_JOIN_DT, JBTTL_CD, PROJ_NO)
+VALUES(#{stuNo}, sysdate, '-', #{projNo})
+</insert>
+
+<delete id="memDel" parameterType="String">
+DELETE FROM TB_JOIN_APLY WHERE STU_NO = #{stuNo}
+</delete>
+
+<select id="projStatus" resultType="projVO" parameterType="String">
+SELECT PROJ_NM, PROJ_EXPLN
+FROM TB_PROJ
+WHERE PROJ_NO = #{projNo}
+</select>
+
+
+</mapper>

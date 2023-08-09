@@ -1,0 +1,44 @@
+gantt.attachEvent("onAfterTaskDrag", function (id, mode) {
+  var task = gantt.getTask(id);
+  if (mode == gantt.config.drag_mode.progress) {
+    var pr = Math.floor(task.progress * 100 * 10) / 10;
+    gantt.message(task.text + " is now " + pr + "% completed!");
+    console.log("간트 차트 onAfterTaskDrag if task", task);
+    console.log("간트 차트 onAfterTaskDrag if task.text", task.text);
+    console.log("간트 차트 onAfterTaskDrag if pr", pr);
+  } else {
+    var convert = gantt.date.date_to_str("%H:%i, %F %j");
+    var s = convert(task.start_date);
+    var e = convert(task.end_date);
+    console.log(
+      "간트 차트 onAfterTaskDrag else" + task.text + "시작 " + s + " 끝 " + e
+    );
+  }
+});
+
+gantt.attachEvent("onBeforeTaskChanged", function (id, mode, old_event) {
+  var task = gantt.getTask(id);
+  if (mode == gantt.config.drag_mode.progress) {
+    if (task.progress < old_event.progress) {
+      console.log("간트 차트 onBeforeTaskChanged" + task.text);
+      return false;
+    }
+  }
+  return true;
+});
+
+gantt.attachEvent("onBeforeTaskDrag", function (id, mode) {
+  var task = gantt.getTask(id);
+  var message = task.text + " ";
+
+  if (mode == gantt.config.drag_mode.progress) {
+    message += "progress is being updated";
+  } else {
+    message += "is being ";
+    if (mode == gantt.config.drag_mode.move) message += "moved";
+    else if (mode == gantt.config.drag_mode.resize) message += "resized";
+  }
+
+  console.log(message);
+  return true;
+});

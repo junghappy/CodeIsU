@@ -1,0 +1,11 @@
+package team.tttt.pms.emp.stulist.web;
+
+public class testt {
+	public static void main(String[] args) {
+
+		String test = "20230101";
+		String neww = "S" + test.substring(2, 6) + test.substring(7, 8);
+
+		System.out.println(neww);
+	}
+}

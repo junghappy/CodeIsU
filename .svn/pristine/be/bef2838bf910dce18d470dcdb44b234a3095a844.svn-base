@@ -1,0 +1,24 @@
+package team.tttt.pms.stu.resume.mapper;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import team.tttt.pms.stu.vo.ResAcbgInfoVO;
+import team.tttt.pms.stu.vo.ResCareerInfoVO;
+import team.tttt.pms.stu.vo.ResCrtfctInfoVO;
+import team.tttt.pms.stu.vo.ResTechInfoVO;
+import team.tttt.pms.stu.vo.ResumeVO;
+
+@Mapper
+public interface ResumeMapper {
+
+	int tbResumeInsert(ResumeVO resumeVO);
+
+	int tbAcbgInsert(ResAcbgInfoVO resAcbgInfoVO);
+
+	int tbCrtfctInsert(ResCrtfctInfoVO crtfctInfoVO);
+
+	int tbCareerInsert(ResCareerInfoVO careerInfoVO);
+
+	int tbTechInsert(ResTechInfoVO techInfoVO);
+
+}

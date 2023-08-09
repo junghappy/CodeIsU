@@ -1,0 +1,209 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<div class="container">
+    <div class="row">
+        <div class="col-2">
+            <div class="table-responsive">
+                <table class="table table-hover border">
+                    <thead>
+                        <tr>
+                            <th scope="col">이름</th>
+                            <th scope="col">점수</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach items="${sbmsnUserList}" var="userSbmsn">
+                            <tr class="sbmsnUserTr" data-stuNo = "${userSbmsn.stuNo}">
+                                <th class="p-2">${userSbmsn.userNm}</th>
+                                <td class="text-end p-2"><fmt:formatNumber value="${100/(userSbmsn.qstCnt)*(userSbmsn.scoreCnt)}" type="number" pattern="0" /> 점</td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-10" id="sbmsnResultContainer">
+
+        </div>
+    </div>
+</div>
+<script>
+var asmtNo = "${asmtNo}";
+var userSbmsn = document.querySelector("#sbmsnResultContainer");
+$(document).ready(function() {
+    start();
+});
+
+function start(){
+    userSbmsn.innerHTML = "";
+    var tbody = document.querySelector("tbody");
+    var myTr = tbody.querySelectorAll("tr");
+    var firstRow = myTr[0];
+    // 맨 처음 화면에 요소 뿌리기
+    var mystuNo = firstRow.getAttribute("data-stuNo");
+    var myscore = firstRow.querySelector("td").innerText;
+    console.log("mystuNo",mystuNo);
+    console.log("myscore",myscore);
+    var mydata = {
+        "stuNo" : mystuNo,
+        "asmtNo" : asmtNo
+    }
+    ajaxFn(mydata, myscore)
+}
+$(document).on("click", ".sbmsnUserTr", function() {
+    userSbmsn.innerHTML = "";
+    var stuNo = this.getAttribute("data-stuNo");
+    var score = this.querySelector("td").innerText;
+    console.log("asmtNo", asmtNo)
+    data = {
+        "stuNo" : stuNo,
+        "asmtNo" : asmtNo
+    }
+    ajaxFn(data, score)
+})
+function ajaxFn(data, score){
+    $.ajax({
+        url: '/tch/class/asmt/sbmsn',
+        method: 'post',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        contentType:'application/json; charset=UTF-8',
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+        },
+        success: function(res) {
+            console.log(res)
+            var sbmsnList = res.sbmsnList;
+            var asmtVO = res.asmtVO;
+            var atchFileList = res.atchFileList;
+    
+            var asmtResultStr = "";
+            asmtResultStr += `<div class="container">                                                                                                                                   `;
+            // 마감일자, 제출일자
+            asmtResultStr += `	<div class="row">                                                                                                                                     `;
+            var qstSbmsnDt = "";
+            sbmsnList.forEach(function(sbmsn) {
+                qstSbmsnDt = sbmsn.qstSbmsnDt + "제출";
+            });
+            asmtResultStr += `        <div class="col-10 text-muted">                                                                                                                   `;
+            asmtResultStr +=              asmtVO.asmtDdln + '까지 · ' + qstSbmsnDt;
+            asmtResultStr += `        </div>                                                                                                                                            `;
+            asmtResultStr += `        <div class="col-2 text-danger text-end" id="scoreDiv">                                                                                            `;
+            // 점수
+            asmtResultStr +=                score
+            asmtResultStr += `        </div>                                                                                                                                            `;
+            asmtResultStr += `	</div>                                                                                                                                                `;
+            asmtResultStr += `	<div>                                                                                                                                                 `;
+            // 제목, 설명
+            asmtResultStr += '		<h2>' + asmtVO.asmtTtl + '</h2>';
+            asmtResultStr += '		<p>' + asmtVO.asmtExpln + '</p>';
+            asmtResultStr += `	</div>                                                                                                                                                `;
+            // 문제
+            asmtResultStr += '		<input type="hidden" name="sbjctCd" value="' + asmtVO.sbjctCd + '">';
+            asmtResultStr += `		<div id="asmtContainer">                                                                                                                          `;
+            var qstCnt = asmtVO.qstList.length;
+            var scoreCnt = 0;
+            for(let i=0; i<asmtVO.qstList.length; i++){
+                var qst = asmtVO.qstList[i];
+                asmtResultStr +=	`				<div class="card qstCard border-dark mb-3">                                                                                               `;
+                asmtResultStr +=	`					                                                                                                                                      `;
+                asmtResultStr +=	`					<div class="card-body">                                                                                                               `;
+                asmtResultStr +=	`						<div class="row mb-4">                                                                                                            `;
+                asmtResultStr +=	'							<p class="mb-0">' + qst.qstCode + '</p>';
+                asmtResultStr +=	`						</div>                                                                                                                            `;
+                asmtResultStr += `						<div class="qst">                                                                                                                 `;
+                asmtResultStr +=	`							<div class="row mb-3 qstTitle">                                                                                               `;
+                asmtResultStr +=	'								<div class="col-10">'+ qst.qstCn +'</div>';
+                asmtResultStr +=	`							</div>                                                                                                                        `;
+                asmtResultStr +=	`                                                                                                                                                          `;
+                asmtResultStr +=	`							<div class="asmttitleimg mb-3">                                                                                               `;
+                atchFileList.forEach(function(atchFile) {
+                    if(qst.atchFileNo == atchFile.atchFileNo){
+                        asmtResultStr +=	'						    <img alt="" src="' + atchFile.filePath +'" style = "width:100%; height: auto;">';
+                    }
+                });
+                asmtResultStr += `							</div>                                                                                                                        `;
+                asmtResultStr += `							<div class="asmtcardDtl">                                                                                                     `;
+                var num = 1;
+                for(let j=0; j<sbmsnList.length; j++){
+                    var sbmsn = sbmsnList[j];
+                    // 해당 문제의 정답비교
+                    if(sbmsn.qstNo == qst.qstNo){
+                        // 객관식
+                        if(qst.qstCode == 'M'){
+                            var qstDtlList = qst.qstDtlList;
+                            qstDtlList.forEach(function(qstDtl) {
+                                console.log("sbmsn.qstSbmsnAns: ", sbmsn.qstSbmsnAns);
+                                console.log("qstDtl.qstDtlNo: ", qstDtl.qstDtlNo);
+                                console.log("qst.qstAns: ", qst.qstAns);
+                                console.log("num: ", num);
+                                // 정답이랑 다르면 정답을 빨강
+                                if(sbmsn.qstSbmsnAns != qstDtl.qstDtlNo && qst.qstAns == num){
+                                    asmtResultStr += `                                        <div class="mb-2 text-danger">                                                                        `;
+                                }
+                                // 정답이랑 다르면 내가 쓴 답은 검정
+                                if(sbmsn.qstSbmsnAns != qstDtl.qstDtlNo && sbmsn.qstSbmsnAns == num){
+                                    asmtResultStr += `                                        <div class="mb-2 text-dark">                                                                        `;
+                                }
+                                // 정답이랑 같으면 정답을 파랑
+                                if(sbmsn.qstSbmsnAns == qstDtl.qstDtlNo && qst.qstAns == num){
+                                    scoreCnt++;
+                                    asmtResultStr += `                                        <div class="mb-2 text-primary">                                                                        `;
+                                }
+                                // 내가 쓴것도 아니고 정답도 아닌것들은 회색
+                                if(sbmsn.qstSbmsnAns != i && qst.qstAns != num){
+                                    asmtResultStr += `                                        <div class="mb-2 text-muted">                                                                        `;
+                                }
+                                asmtResultStr +=                                                         qstDtl.qstDtlCn;
+                                asmtResultStr += `                                            </div>                                                                                                    `;
+                                num++;
+                            });
+                        } else {
+                            // 주관식
+                            asmtResultStr += `                                            <div class="row align-items-center">                                                                          `;
+                            asmtResultStr += `                                                <div class="col-1">답</div>                                                                                `;
+                            // 내가 쓴 답이라면
+                            if(sbmsn.qstSbmsnAns == qst.qstAns){
+                                scoreCnt++;
+                                asmtResultStr += `                                                    <div class="col-9 text-primary">                                                                      `;
+                                asmtResultStr +=                                                         sbmsn.qstSbmsnAns;
+                                asmtResultStr += `                                                    </div>                                                                                                `;
+                            } else{
+                                // 정답이 아니라면
+                                asmtResultStr += `                                                    <div class="col-9 text-dark">`;
+                                asmtResultStr +=                                                         sbmsn.qstSbmsnAns;
+                                asmtResultStr += `                                                    </div>                                                                                                `;
+                            }
+                            asmtResultStr += `                                                <div class="col-2"></div>                                                                                 `;
+                            asmtResultStr += `                                            </div>                                                                                                        `;
+                            asmtResultStr += `                                            <div class="row"></div>                                                                                       `;
+                            // 정답이 아니라면
+                            if(sbmsn.qstSbmsnAns != qst.qstAns){
+                                asmtResultStr += `                                                    <div class="col text-danger">                                                                         `;
+                                asmtResultStr +=                                                         qst.qstAns
+                                asmtResultStr += `                                                    </div>                                                                                                `;
+    
+                            }
+                            asmtResultStr += `                                            <div class="row"></div>                                                                                       `;
+                        }
+                    }
+                }
+    
+                asmtResultStr += `							</div>                                                                                                                        `;
+                asmtResultStr += `						</div>                                                                                                                            `;
+                asmtResultStr += `					</div>                                                                                                                                `;
+                asmtResultStr += `				</div>                                                                                                                                    `;
+            }
+            asmtResultStr += `		</div>                                                                                                                                            `;
+            asmtResultStr += `</div>                                                                                                                                                    `;
+            userSbmsn.innerHTML = asmtResultStr;
+        },
+        error: function(xhr, status, error) {
+            // 요청이 실패했을 때 처리할 코드 작성
+            alert("제발");
+        }
+    });
+}
+</script>

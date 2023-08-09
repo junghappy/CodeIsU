@@ -1,0 +1,12 @@
+package team.tttt.webapp.mapper;
+
+import java.util.List;
+
+import team.tttt.webapp.vo.MemManagementVO;
+
+public interface MemManagementMapper {
+
+	public List<MemManagementVO> list(String projNo);
+
+
+}

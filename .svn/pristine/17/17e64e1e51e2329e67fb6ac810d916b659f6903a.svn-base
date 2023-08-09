@@ -1,0 +1,255 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+
+<style>
+table{
+    border-collapse: inherit;
+}
+</style>
+<!-- 프로젝트 가입 신청 리스트  -->
+<div class="card">
+  <div class="table-responsive"><br>
+<!-- <button class="btn btn-primary btn-sm" style="float: right; margin-right:30px;" type="button">자료등록</button> <br> -->
+    <table class="table align-items-center mb-0" id="memJoinTable">
+	<button id="joinBtn">가입리스트</button>
+    </table>
+  </div>
+</div>
+<br>
+
+<script>
+
+
+
+$("#joinBtn").on("click",function(){
+	$(function(){
+
+		var projNo = 'a001';
+
+			$.ajax({
+				url : "/pms/memJoinAply.do?${_csrf.parameterName }=${_csrf.token}",
+				data: {
+					projNo: projNo
+				},
+
+		    	type: 'post',
+		    	contentType:'application/json; charset=utf-8',
+
+		    	success: function(res) {
+		    		code = "";
+		    		code += `
+		    	        <tr>
+		    	          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-5">이름</th>
+		    	          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-5">신청일</th>
+		    	        </tr>
+
+		    		`;
+		    		$.each(res, function(i, v){
+		    		code += `
+				           <tr>
+		    				  <td class="align-middle text-center text-sm">
+					              <h6 class="text-secondary text-xs font-weight-normal" name="userNm" id="userNm">\${v.userNm}</h6>
+					          </td>
+					          <td class="align-middle text-center text-sm">
+					            <span class="text-secondary text-xs font-weight-normal" name="applyDate" id="applyDate">\${v.applyDate}</span>
+					          </td>
+				          </tr>
+		    			`;
+		    		})
+		    	    $('#memJoinTable').html(code);
+		    	},
+
+		    	    error: function(xhr) {
+		    	      alert("상태: " + xhr.status);
+		    	    },
+		    	    dataType: 'json'
+		    	  });
+
+	})
+
+
+})
+</script>
+
+
+
+
+
+<!-- 프로젝트 멤버 리스트 -->
+<div class="card">
+  <div class="table-responsive"><br>
+<!-- <button class="btn btn-primary btn-sm" style="float: right; margin-right:30px;" type="button">자료등록</button> <br> -->
+<button id="member">멤버관리</button>
+    <table class="table align-items-center mb-0" id="ajaxtest">
+
+    </table>
+  </div>
+</div>
+
+<!-- Modal 시작-->
+<div class="modal fade" id="positionUpdateModal" role="dialog" aria-labelledby="memUpdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog d-flex justify-content-center" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-normal" id="memUpdateModalLabel">직책 변경</h5>
+        </div>
+
+      <div class="modal-body">
+         <form>
+
+	      <label class="form-label" for="memStatus" class="ms-0">직책</label>
+	      <select class="form-select mem" id="memStatus" name="memStatus">
+			  <option value="PM">PM</option>
+			  <option value="PL" selected>PL</option>
+			  <option value="AA">AA</option>
+			  <option value="TA">TA</option>
+			  <option value="DA">DA</option>
+			  <option value="QA">QA</option>
+			  <option value="EA">EA</option>
+			  <option value="SA">SA</option>
+			  <option value="개발자">개발자</option>
+		  </select>
+
+	      <div class="modal-footer">
+	        <button type="button" class="btn bg msubBtn" id="updateBtn">수정</button>
+	        <button type="button" class="btn bg mcanBtn" data-bs-dismiss="modal" id="cancleBtn">취소</button>
+	      </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal 끝-->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+
+
+/* 멤버관리 리스트 조회 */
+$("#member").on("click",function(){
+	$(function(){
+
+		var projNo = 'a001';
+
+			$.ajax({
+				url : "/pms/mem.do?${_csrf.parameterName }=${_csrf.token}",
+				data: {
+					projNo: projNo
+				},
+
+		    	type: 'post',
+		    	contentType:'application/json; charset=utf-8',
+
+		    	success: function(res) {
+		    		code = "";
+		    		code += `
+		    	        <tr>
+		    			  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-5">이름</th>
+		    			  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-5">이메일</th>
+		    	          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-5">전화번호</th>
+		    	          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-5">가입일</th>
+		    	          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-5">직책</th>
+		    	        </tr>
+
+		    		`;
+		    		$.each(res, function(i, v){
+		    		code += `
+				           <tr>
+		    				  <td>
+					            <div class="text-center">
+					              <div class="d-flex flex-column justify-content-center">
+					                <span class="mb-0 text-xs" name="stuNo" id="stuNo">\${v.stuNo}</span>
+					              </div>
+					            </div>
+					          </td>
+					          <td class="align-middle text-center text-sm">
+					            <span class="text-secondary text-center text-xs font-weight-normal" name="userEmlAddr" id="userEmlAddr">\${v.userEmlAddr}</span>
+					          </td>
+					          <td class="align-middle text-center text-sm">
+					            <span class="text-secondary text-xs font-weight-normal" name="userPhoneno" id="userPhoneno">\${v.userPhoneno}</span>
+					          </td>
+					          <td class="align-middle text-center">
+					            <span class="text-secondary text-xs font-weight-normal" name="teamJoinDt" id="teamJoinDt">\${v.teamJoinDt}</span>
+					          </td>
+					          <td class="align-middle text-center">
+					            <span class="text-secondary text-xs font-weight-normal" name="jbttlCd" id="jbttlCd">\${v.jbttlCd}</span>
+				        	  </td>
+				          </tr>
+		    			`;
+		    		})
+					//var stuNo = $("#stuNo").val();
+		    	    $('#ajaxtest').html(code);
+		    	},
+
+		    	    error: function(xhr) {
+		    	      alert("상태: " + xhr.status);
+		    	    },
+		    	    dataType: 'json'
+		    	  });
+
+	})
+
+
+})
+
+$(document).ready(function(){
+	$("#jbttlCd").click(function() {
+
+
+
+		$("#positionUpdateModal").modal("show");
+	})
+})
+
+/* 멤버관리 직책 수정 */
+$("#updateBtn").on("click", function(){
+	var jbttlCd = $("#memStatus").val();   //선택한 옵션 값 가져와서 저장하기
+	var stuNo = $("#stuNo").val();
+
+	console.log(jbttlCd+"직책");
+	console.log(stuNo+"학번");
+
+ //서버로 보내기
+	$.positionUpdate(jbttlCd, stuNo);
+
+	$("#positionUpdateModal").modal("hide");
+})
+
+/* 멤버관리 직책 수정 완료 */
+
+
+$.positionUpdate = function(jbttlCd, stuNo){
+
+
+
+    $.ajax({
+            url : "/pms/memupdate.do?${_csrf.parameterName }=${_csrf.token}",
+            type : 'post',
+            data : {
+            	jbttlCd:jbttlCd,
+            	stuNo:stuNo
+            },
+            success : function(res) {
+
+         	   console.log(res);
+               alert("수정이 완료되었습니다.");
+            //화면(본문의 내용) 바꾸기
+               $.updateView(res);
+
+            },
+            error : function(xhr) {
+               alert("상태 : " + xhr.status)
+            },
+            dataType : 'json'
+    })
+}
+
+/* 수정된 데이터 화면에 업데이트 */
+
+  $.updateView = function(res) {
+	$("#jbttlCd").html(res.jbttlCd);
+
+}
+</script>

@@ -1,0 +1,39 @@
+package team.tttt.pms.stu.resume.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import team.tttt.pms.common.vo.UserVO;
+import team.tttt.pms.stu.vo.ResAcbgInfoVO;
+import team.tttt.pms.stu.vo.ResCareerInfoVO;
+import team.tttt.pms.stu.vo.ResCrtfctInfoVO;
+import team.tttt.pms.stu.vo.ResTechInfoVO;
+import team.tttt.pms.stu.vo.ResumeVO;
+
+@Mapper
+public interface ResumeMapper {
+
+	int tbResumeInsert(ResumeVO resumeVO);
+
+	int tbAcbgInsert(ResAcbgInfoVO resAcbgInfoVO);
+
+	int tbCrtfctInsert(ResCrtfctInfoVO crtfctInfoVO);
+
+	int tbCareerInsert(ResCareerInfoVO careerInfoVO);
+
+	int tbTechInsert(ResTechInfoVO techInfoVO);
+
+	// Resume 불러오기
+	ResumeVO selectResume(String resumeNo);
+	UserVO getUserInfo(String stuNo);
+	List<ResAcbgInfoVO> selectAcbgList(String resumeNo);
+	List<ResCrtfctInfoVO> selectCrtfctList(String resumeNo);
+	List<ResCareerInfoVO> selectCareerList(String resumeNo);
+	List<ResTechInfoVO> selectTechList(String resumeNo);
+
+	// 본인 이력서리스트 조회
+	List<ResumeVO> selectResumeList(String userNo);
+
+
+}

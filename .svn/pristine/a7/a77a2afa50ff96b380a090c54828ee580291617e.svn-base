@@ -1,0 +1,24 @@
+package team.tttt.pms.stu.main.service.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import team.tttt.pms.stu.main.mapper.StuMainMapper;
+import team.tttt.pms.stu.main.service.StuMainService;
+import team.tttt.pms.stu.vo.ProjListVO;
+
+@Service
+public class StuMainServiceImpl implements StuMainService{
+
+	@Inject
+	private StuMainMapper mapper;
+
+	@Override
+	public List<ProjListVO> projList(String stuNo) {
+		return mapper.projList(stuNo);
+	}
+
+}

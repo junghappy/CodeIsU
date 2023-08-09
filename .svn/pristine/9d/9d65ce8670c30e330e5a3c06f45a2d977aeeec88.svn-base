@@ -1,0 +1,9 @@
+package team.tttt.pms.stu.mypage.service;
+
+import team.tttt.pms.common.enums.ServiceResult;
+
+public interface QrCheckService {
+
+	ServiceResult insertToken(String uuidToken);
+
+}

@@ -1,0 +1,324 @@
+/**
+ *
+ */
+
+// 헤더, 토큰 가져오는 메서드
+const deliverToken = (header, token) => {
+  return { header: header, token: token };
+};
+
+// 담당자 리스트
+const getAsgList = (asgList) => {
+  let taskPics = "";
+
+  for (let i = 0; i < asgList.length; i++) {
+    taskPics += asgList[i].userNm + " ";
+  }
+  console.log(taskPics);
+  return taskPics;
+};
+
+// 날짜 수정
+function convertDate(Cdate) {
+  const year = Cdate.substring(0, 4);
+  const month = Cdate.substring(4, 6);
+  const day = Cdate.substring(6, 8);
+  const formattedDate = year + "-" + month + "-" + day;
+  return formattedDate;
+}
+
+// 상세보기 모달
+function detailTask(taskNo) {
+  $.ajax({
+    url: "/pms/project/taskDetail",
+    data: {
+      taskNo: taskNo,
+    },
+    type: "get",
+    dataType: "json",
+    success: function (res) {
+      const taskBengDt = convertDate(res.taskBengDt);
+
+      const taskDdlnDt = convertDate(res.taskDdlnDt);
+
+      console.log(taskBengDt);
+
+      let taskPics = getAsgList(res.asgList);
+
+      console.log(taskPics);
+
+      const modalHtml = `
+              <div class="modal-header">
+              <h5 class="modal-title font-weight-normal" id="taskDetailModalLabel">
+                일감 상세보기
+              </h5>
+            </div>
+            <div class="modal-body">
+              <form>
+                <label class="form-label mb-0" for="taskDetailTitle">제목</label>
+                <p id="taskDetailTitle" name="taskTitle" class="form-control task mb-1">${res.taskTitle}</p>
+
+                <label class="form-label mb-0" for="taskDetailtaskNo">업무번호</label>
+                <p id="taskDetailtaskNo" name="taskNo"  class="form-control task mb-1" >${res.taskNo}<p>
+
+                <label class="form-label mb-0" for="taskDetailStts">상태</label>
+                <p class="form-control task mb-1" id="taskDetailStts" name="taskStts">${res.taskStts}</p>
+
+                <label class="form-label mb-0" for="taskDetailPic">담당자</label>
+                <p name="taskPic" id="taskDetailPic" class="form-control task mb-1"> ${taskPics}</p>
+
+                <label class="form-label mb-0" for="taskDetailSttr">진척도</label>
+                <div class="progress">
+                  <div class="progress-bar bg-info" id="taskDetailSttr" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: ${res.taskSttr}%;"></div>
+                </div>
+
+                <label class="form-label mb-0" for="taskDetailRegDt">등록일</label>
+                <p name="taskRegDt" id="taskDetailRegDt" class="form-control task mb-1">${res.taskRegDt}</p>
+
+                <label class="form-label mb-0" for="taskDetailBengDt">시작날짜</label>
+                <p name="taskBengDt" id="taskDetailBengDt" class="form-control task mb-1">${taskBengDt}</p>
+
+                <label class="forms-label" for="taskDetailDdlnDt">종료날짜</label>
+                <p id="taskDetailDdlnDt" name="taskDdlnDt" class="form-control task mb-1">${taskDdlnDt}</p>
+
+                <label class="form-label mb-0" for="taskDetailPriority">우선순위</label>
+                <p class="form-control task mb-1"id="taskDetailPriority" name="taskPriority" aria-label="Default select example">${res.taskPriority}</p>
+
+                <label class="form-label mb-0" for="taskDetailCn">내용</label>
+                <p
+                  class="form-control task mb-1 Cn"
+                  id="taskDetailCn"
+                  name="taskCn"
+                >${res.taskCn}</p>
+
+                <div class="modal-footer">
+                  <button type="button" id="updateTaskBtn" class="btn bg msubBtn">수정</button>
+                  <button type="button" id="deleteTaskBtn" class="btn bg msubBtn">삭제</button>
+                  <button
+                    type="button"
+                    class="btn bg mcanBtn"
+                    data-bs-dismiss="modal"
+                  >
+                    닫기
+                  </button>
+                </div>
+              </form>
+            </div>
+              `;
+      $("#taskModalBody").html(modalHtml);
+
+      $("#taskModal").modal("show");
+    },
+  });
+}
+
+// 업데이트 모달
+function updateTask(taskNo) {
+  $.ajax({
+    url: "/pms/project/taskDetail",
+    data: {
+      taskNo: taskNo,
+    },
+    type: "get",
+    dataType: "json",
+    success: function (res) {
+      const taskBengDt = convertDate(res.taskBengDt);
+
+      const taskDdlnDt = convertDate(res.taskDdlnDt);
+
+      console.log(taskBengDt);
+
+      let taskPics = getAsgList(res.asgList);
+
+      console.log(taskPics);
+
+      const modalHtml = `
+                <div class="modal-header">
+                <h5 class="modal-title font-weight-normal" id="taskUpdateModalLabel">
+                  일감 수정하기
+                </h5>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <label class="form-label mb-0" for="taskUpdateTitle">제목</label>
+                  <input
+                    type="text"
+                    id="taskUpdateTitle"
+                    name="taskTitle"
+                    class="form-control task mb-1"
+                    value="${res.taskTitle}"
+                  />
+
+                  <label class="form-label mb-0" for="taskUpdatetaskNo">업무번호</label>
+                  <input
+                    type="text"
+                    id="taskUpdatetaskNo"
+                    name="taskNo"
+                    class="form-control task mb-1" readonly="readonly"
+                    value="${res.taskNo}"
+                    />
+
+                  <label class="form-label mb-0" for="taskUpdateStts" class="ms-0"
+                    >상태</label
+                  >
+                  <select class="form-select task" id="taskUpdateStts" name="taskStts">
+
+                  </select>
+
+
+                  <label class="form-label mb-0" for="taskUpdatePic">담당자</label>
+                  <select class="form-select task" multiple="true" id="taskUpdatePic" name="taskStts">
+
+                  </select>
+
+                  <label class="form-label mb-0" for="taskUpdateSttr">진척도</label>
+                  <div class="progress">
+                    <div class="progress-bar bg-info" id="taskUpdateSttr" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: ${res.taskSttr}%;"></div>
+                  </div>
+
+                  <label class="form-label mb-0" for="taskUpdateRegDt">등록일</label>
+                  <input
+                    type="date"
+                    name="taskRegDt"
+                    id="taskUpdateRegDt"
+                    class="form-control task mb-1"
+                    value=${res.taskRegDt}
+                  />
+
+                  <label class="form-label mb-0" for="taskUpdateBengDt">시작날짜</label>
+                  <input
+                    type="date"
+                    name="taskBengDt"
+                    id="taskUpdateBengDt"
+                    class="form-control task mb-1"
+                    value=${taskBengDt}
+                  />
+
+                  <label class="forms-label" for="taskUpdateDdlnDt">종료날짜</label>
+                  <input
+                    type="date"
+                    id="taskUpdateDdlnDt"
+                    name="taskDdlnDt"
+                    class="form-control task mb-1"
+                    value=${taskDdlnDt}
+                  />
+
+                  <label class="form-label mb-0" for="taskUpdatePriority">우선순위</label>
+                  <select class="form-select task" id="taskUpdatePriority" name="taskStts">
+
+                  </select>
+
+                  <label class="form-label mb-0" for="taskUpdateCn">내용</label>
+                  <textarea
+                    class="form-control task mb-1 Cn"
+                    id="taskUpdateCn"
+                    name="taskCn"
+                  >${res.taskCn}</textarea>
+
+                  <div class="modal-footer">
+                    <button type="button" id="updateSaveBtn" class="btn bg msubBtn">저장</button>
+                    <button
+                      type="button"
+                      class="btn bg mcanBtn"
+                      data-bs-dismiss="modal"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </form>
+              </div>
+                `;
+
+      $("#taskModalBody").html(modalHtml);
+      getTeamMemList(projNo);
+      getCode("P005", "taskUpdatePriority");
+      getCode("P003", "taskUpdateStts");
+
+      $("#taskModal").modal("show");
+    },
+  });
+}
+
+function deleteTask(taskNo, header, token) {
+  console.log("deleteTask ----", taskNo);
+  var result = confirm("삭제하시겠습니까?");
+
+  if (result) {
+    $.ajax({
+      url: "/pms/project/taskDelete",
+      data: JSON.stringify({
+        taskNo: taskNo,
+      }),
+      type: "delete",
+      dataType: "text",
+      contentType: "application/json;charset=utf-8",
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader(header, token);
+      },
+      success: function (res) {
+        console.log("삭제성공", taskNo);
+
+        getData(projNo);
+      },
+      error: function (request, status, error) {
+        console.log("code: " + request.status);
+        console.log("message: " + request.responseText);
+        console.log("error: " + error);
+      },
+    });
+
+    alert("삭제되었습니다.");
+  } else {
+    return;
+  }
+}
+
+// 프로젝트 팀원 리스트 추출
+const getTeamMemList = (projNo) => {
+  $.ajax({
+    url: "/pms/project/extractMem",
+    data: {
+      projNo: projNo,
+    },
+    type: "get",
+    dataType: "json",
+    success: function (res) {
+      console.log("팀원", res);
+      let teamOption = "";
+      for (let i = 0; i < res.length; i++) {
+        teamOption += `<option value=${res[i].stuNo}>${res[i].userNm}</option>`;
+      }
+      console.log("getTeamMemList : " + teamOption);
+      $("#taskUpdatePic").html(teamOption);
+    },
+    error: function (xhr) {
+      console.log("getTeamMemList 상태: " + xhr.status);
+    },
+  });
+};
+
+// 삭제버튼
+document.addEventListener("click", function (event) {
+  if (event.target.id === "deleteTaskBtn") {
+    const taskNo = document.getElementById("taskDetailtaskNo").innerText;
+    deleteTask(taskNo);
+  }
+});
+
+// 수정버튼
+document.addEventListener("click", function (event) {
+  if (event.target.id === "updateTaskBtn") {
+    const taskNo = document.getElementById("taskDetailtaskNo").innerText;
+    console.log("updateTask : " + taskNo);
+    updateTask(taskNo);
+  }
+});
+
+// 수정 저장 버튼
+document.addEventListener("click", function (event) {
+  if (event.target.id === "updateSaveBtn") {
+    const taskNo = document.getElementById("taskUpdatetaskNo").innerText;
+    console.log("updateSaveTask : " + taskNo);
+    updateTaskSave(taskNo);
+  }
+});

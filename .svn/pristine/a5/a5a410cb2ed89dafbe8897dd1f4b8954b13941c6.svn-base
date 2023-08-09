@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.webapp.mapper.CmCdMapper">
+
+<select id="selectCode" parameterType="String" resultType="cmcdVO">
+	/* team.tttt.webapp.mapper.CmCdMapper.selectCode  */
+	select
+	    tb_cm_cd.cd_vl
+	    , tb_cm_cd.cd_c_use_yn
+	    , tb_cm_cd.cd_type_id
+	    , tb_cm_cd.cd_nm
+	    , tb_cm_cd.cd_expln
+	    , tb_cm_type.cd_type_nm
+	from tb_cm_cd
+	join tb_cm_type on tb_cm_cd.cd_type_id = tb_cm_type.cd_type_id
+	where
+	    tb_cm_type.cd_type_id = #{cdTypeId} and tb_cm_cd.cd_c_use_yn ='Y'
+</select>
+
+
+</mapper>

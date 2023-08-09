@@ -1,0 +1,18 @@
+package team.tttt.webapp.pms.service;
+
+import java.util.List;
+
+import team.tttt.webapp.common.enums.ServiceResult;
+import team.tttt.webapp.vo.MemJoinAplyVO;
+import team.tttt.webapp.vo.MemManagementVO;
+
+public interface IMemManagementService {
+
+	public List<MemManagementVO> memList(String projNo);
+
+	public ServiceResult positionModify(String jbttlCd, String stuNo);
+
+	public List<MemJoinAplyVO> memJoinAplyList(String projNo);
+
+
+}

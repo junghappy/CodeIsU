@@ -1,0 +1,24 @@
+2023-0208-01)함수(User Defined Function)
+  - 반환 값이 존재하는 서브프로그램(SELECT문의 SELECT절 WHERE절, INSERT문의 VALUES,
+    UPDATE문의 SET절, WHERE절에서 사용 가능)
+  - 그 밖의 특징은 프로시져와 동일
+  0
+(사용형식)
+    CREATE [OR REPLACE] FUNCTION 함수명[(
+      매개변수 [IN|OUT|INOUT] 타입 [:=|DEFAULT 값][,]
+                        :
+      매개변수 [IN|OUT|INOUT] 타입 [:=|DEFAULT 값])]                        
+    IS|AS
+      선언영역
+    BEGIN
+      실행영역
+      RETURN expr;
+      
+      [EXCEPTION
+        예외처리]
+    END;
+  
+  .'RETURN 타입명': 반환할 타입명만 기술
+  .'RETURN expr': 실행영역에서 반드시 하나 이상의 RETURN 문에 의하여 값을 반환해야 함
+  . FUNCTION에서는 OUT매개변수를 사용하지 않음
+  

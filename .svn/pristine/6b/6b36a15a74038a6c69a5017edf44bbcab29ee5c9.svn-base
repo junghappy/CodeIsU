@@ -1,0 +1,13 @@
+package team.tttt.pms.emp.kalleave.service;
+
+import java.util.List;
+
+import team.tttt.pms.stu.vo.AttdanVO;
+
+public interface KalleaveService {
+
+	public List<AttdanVO> attdanAllList();
+	public List<AttdanVO> attdanapproval();
+	public List<AttdanVO> attdanunapproved();
+	public int approvalUpdate(AttdanVO attdanVO);
+}

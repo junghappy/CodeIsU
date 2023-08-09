@@ -1,0 +1,96 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<link type="text/css" rel="stylesheet" href="/resources/jsgrid/jsgrid.min.css" />
+<link type="text/css" rel="stylesheet" href="/resources/jsgrid/jsgrid-theme.min.css" />
+
+<script type="text/javascript" src="/resources/jsgrid/jsgrid.min.js"></script>
+
+
+<button id="btnAdd" type="button" onclick="AddClick()">Add User</button><button class="jsgrid-button jsgrid-insert-button">등록</button>
+<div id="jsGrid"></div>
+
+
+<script>
+
+$.ajax({
+	url: "/emp/stuman/stulist/getlist?${_csrf.parameterName}=${_csrf.token}",
+	method: "POST",
+	dataType: "json",
+	success: function(result){
+		console.log(result);
+		renderGrid(result);
+	},
+	error: function() {
+		alert("ajax에러");
+	}
+})
+
+
+
+function renderGrid(data) {
+
+	var typeGender = [
+		{	name: "남", value: "M"},
+		{	name: "여", value: "F"}
+	]
+
+    $("#jsGrid").jsGrid({
+
+    	locale:"ko",
+        width: "100%",
+        height: "400px",
+
+        inserting: true,
+        editing: true,
+        sorting: true,
+        paging: true,
+
+        data: data.stuList,
+        controller: {
+        	insertItem: function(item) {
+        		$.ajax({
+							url: "/emp/stuman/stulist/insertstuone?${_csrf.parameterName}=${_csrf.token}",
+							contentType: 'application/json; charset=utf-8',
+							method: "POST",
+							dataType: "text",
+							data: JSON.stringify(item),
+							success: function(result){
+								console.log(result);
+							},
+							error: function() {
+								alert("ajax에러");
+							}
+							})
+        	}
+        },
+
+        fields: [
+            { name: "svlfNo", title: "연수과정", type: "select", items: data.svlfList, valueField: "svlfNo", textField: "svlfNm", width: 100, validate: "required" },
+            { name: "stuNo", title: "원생번호", type: "text", width: 50, align: "center"},
+            { name: "userNm", title: "이름", type: "text", width: 40 , align: "center" , validate: "required"},
+            { name: "userGender", title: "성별", type: "select", items: typeGender, valueField: "value", textField: "name", width: 30},
+            { name: "userBrdt", title: "생년월일",type: "text", width: 40 , align: "center", validate: "required" },
+            { name: "userPhoneno", title: "연락처",type: "text" , width: 50 , align: "center", validate: "required" },
+            { name: "userEmlAddr", title: "이메일",type: "text", width: 120},
+            { type: "control", width: 30}
+
+
+        ]
+    });
+}
+function AddClick() {
+	  if ($('.jsgrid-insert-row').css('display') == "none") {
+	    //Add 버튼 보이기, Show Add Button
+	    $('.jsgrid-insert-row').css({ display: 'table-row' });
+	    $('#btnAdd').text('Close');
+	    return false;
+	  }
+
+	  if ($('.jsgrid-insert-row').css('display') == "table-row") {
+	    //Add 버튼 숨기기, Hide Add Button
+	    $('.jsgrid-insert-row').css({ display: 'none' });
+	    $('#btnAdd').text('Add User');
+	    return false;
+	  }
+	}
+</script>

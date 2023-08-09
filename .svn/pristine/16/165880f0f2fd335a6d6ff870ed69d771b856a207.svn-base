@@ -1,0 +1,18 @@
+package team.tttt.webapp.vo;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Setter
+@Getter
+@ToString
+public class HntcVO {
+	private String hntcNo;
+	private String empNo;
+	private String hntcNm;
+	private String hntcDt;
+	private String hntcCn;
+	private int atchFileNo;
+
+}

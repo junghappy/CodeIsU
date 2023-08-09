@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.webapp.mapper.UserTestMapper">
+
+
+	<insert id="insertUser" parameterType="userVO">
+	insert all
+		into C_USER(user_no, user_pswd, user_type) values (#{userNo}, #{userPswd}, #{userType})
+		into STU(STU_NO, USER_NM, USER_EML_ADDR, USER_PHONENO, USER_ADDR, USER_DADDR, REG_DT, JOIN_DT, USER_PRVC_YN)
+		values (#{userNo} ,#{userNm} ,#{userEmlAddr} ,#{userPhoneno} ,#{userAddr} ,#{userDaddr} ,#{regDt} ,sysdate ,#{userPrvcYn})
+		into role_assign(user_no, ROLE_CD) values (#{userNo},
+		<if test="userType == 'STU'">
+		'S01'
+		</if>
+		<if test="userType == 'EMP'">
+		'E01'
+		</if>
+		<if test="userType == 'TCH'">
+		'E02'
+		</if>
+			)
+	select * from dual
+	</insert>
+
+
+
+
+</mapper>

@@ -1,0 +1,93 @@
+package team.tttt.webapp.pms.task.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import team.tttt.webapp.common.enums.ServiceResult;
+import team.tttt.webapp.mapper.ProjectTaskMapper;
+import team.tttt.webapp.vo.ASGVO;
+import team.tttt.webapp.vo.TaskVO;
+
+
+@Service
+public class ProjectTaskServiceImpl implements ProjectTaskService {
+
+	@Inject
+	private ProjectTaskMapper mapper;
+
+	@Override
+	public int insertUpperTask(TaskVO taskVO) {
+		return mapper.insertUpperTask(taskVO);
+	}
+
+	@Override
+	public int insertLowerTask(TaskVO taskVO) {
+		return mapper.insertLowerTask(taskVO);
+	}
+
+	@Override
+	public List<TaskVO> taskList(String projNo) {
+		System.out.println("------------"+projNo+"----------services");
+		return mapper.taskList(projNo);
+	}
+
+	@Override
+	public TaskVO taskDetail(String taskNo) {
+		return mapper.taskDetail(taskNo);
+	}
+
+	@Override
+	public ServiceResult taskDelete(String taskNo) {
+
+		int cnt = mapper.taskDelete(taskNo);
+
+		if(cnt > 0){
+			return ServiceResult.OK;
+
+		}
+		return ServiceResult.FAILED;
+	}
+
+	@Override
+	public TaskVO getDetailTask(String taskNo) {
+		return mapper.taskDetail(taskNo);
+	}
+
+
+	// 업무 수정부분
+	@Override
+	@Transactional
+	public ServiceResult taskUpdate(TaskVO taskVO) {
+
+		List<ASGVO> asgList = taskVO.getAsgList();
+
+		int cnt =0;
+
+
+		for (int i=0; i<asgList.size(); i++) {
+			cnt += mapper.deleteTaskPic(asgList.get(i));
+		}
+		System.out.println(cnt+"------- deleteTaskPic 결과 ");
+
+		for (int i=0; i<asgList.size(); i++) {
+			cnt += mapper.insertTaskPic(asgList.get(i));
+		}
+
+		cnt += mapper.taskUpdate(taskVO);
+
+		if(cnt > 1){
+			return ServiceResult.OK;
+
+		}
+		return ServiceResult.FAILED;
+	}
+
+
+
+
+}

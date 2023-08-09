@@ -1,0 +1,57 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="container">
+    <form action="/stu/classroom/qstn" method="post" id="qstnForm">
+    	<input type="hidden" id="editorInput" name="editorInput">
+        <div id="editor"></div>
+        <input id="btn" type="button" value="등록">
+    </form>
+</div>
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.css"/>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+const Editor = toastui.Editor;
+
+const editor = new Editor({
+        el: document.querySelector('#editor'),
+        toolbarItems: [
+        	['heading', 'bold', 'italic', 'strike'],
+            ['hr', 'quote'],
+            ['ul', 'ol', 'task', 'indent', 'outdent'],
+            ['table', 'code', 'codeblock']
+        ],
+        height: '300px',
+        initialEditType: 'wysiwyg',
+        previewStyle: 'vertical'
+    });
+
+var btn = document.querySelector("#btn");
+
+    btn.addEventListener("click", function () {
+	let qstnForm = document.querySelector("#qstnForm");
+    let editorData = editor.getHTML();
+    console.log(editorData);
+    let editorInput = document.querySelector("#editorInput");
+    editorInput.value = editorData;
+	qstnForm.submit();
+
+    /*
+    $.ajax({
+	    url: '/stu/classroom/qstn/qstnList',
+	    method: 'post',
+	    data: {
+	      "txt":txt
+	    },
+	    dataType: 'json',
+	    success: function(response) {
+	      console.log(response);
+
+	    },
+	    error: function(xhr, status, error) {
+	      // 요청이 실패했을 때 처리할 코드 작성
+	      console.error('Request failed. Status:', status);
+	    }
+	});
+ */
+})
+</script>

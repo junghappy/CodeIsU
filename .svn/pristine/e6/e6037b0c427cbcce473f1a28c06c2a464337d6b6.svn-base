@@ -1,0 +1,19 @@
+package team.tttt.webapp.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import team.tttt.webapp.vo.MemJoinAplyVO;
+import team.tttt.webapp.vo.MemManagementVO;
+
+public interface MemManagementMapper {
+
+	public List<MemManagementVO> memList(String projNo);
+
+	public int positionModify(Map<String, String> map);
+
+	public List<MemJoinAplyVO> memJoinAplyList(String projNo);
+
+
+
+}

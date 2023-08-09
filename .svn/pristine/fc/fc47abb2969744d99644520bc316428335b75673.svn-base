@@ -1,0 +1,25 @@
+package team.tttt.pms.project.calander.web;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import team.tttt.pms.project.vo.TaskVO;
+
+@Controller
+@RequestMapping("/pms/project")
+public class PmsCalanderController {
+
+
+
+	@RequestMapping("/calander")
+	public String list(String projNo, Model model) {
+		model.addAttribute("projNo",projNo);
+
+		return "pms/com/taskCalander";
+	}
+
+
+}

@@ -1,0 +1,22 @@
+package team.tttt.webapp.stu.web.classroom;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/stu")
+public class StuQstnController {
+    @RequestMapping(value = "/classroom/qstn", method = RequestMethod.GET)
+    public String qstlList() {
+    	return "stu/com/classroom/qstnList";
+    }
+
+    @RequestMapping(value = "/classroom/qstn", method = RequestMethod.POST)
+    public String qstInsert() {
+        return "stu/com/classroom/qstnList";
+    }
+}

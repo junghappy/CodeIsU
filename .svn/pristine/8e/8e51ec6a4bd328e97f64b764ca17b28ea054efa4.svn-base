@@ -1,0 +1,25 @@
+package team.tttt.webapp.emp.web;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import lombok.extern.slf4j.Slf4j;
+import team.tttt.webapp.stu.web.TestController;
+import team.tttt.webapp.vo.UserVO;
+
+@Slf4j
+@Controller
+@RequestMapping("/emp")
+public class EmpMainController {
+
+
+	@RequestMapping(value = "/main", method = RequestMethod.GET)
+	public String empMain() {
+
+	return "emp/com/main"; }
+
+
+
+}

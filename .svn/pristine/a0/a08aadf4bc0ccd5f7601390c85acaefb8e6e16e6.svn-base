@@ -1,0 +1,12 @@
+package team.tttt.pms.project.alarm.mapper;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import team.tttt.pms.project.vo.AlarmVO;
+
+@Mapper
+public interface AlarmMapper {
+
+	void saveAlarm(AlarmVO aVO);
+
+}

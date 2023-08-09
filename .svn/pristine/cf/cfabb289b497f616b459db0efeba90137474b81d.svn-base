@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<!--  Tiles 설정 -->
+
+<tiles-definitions>
+
+
+
+<!-- 학생 템플릿 -->
+	<definition name="stuTemplate" template="/WEB-INF/views/stu/layout/mainTemplate.jsp">
+		<put-attribute name="top" value="/WEB-INF/views/stu/layout/top/stu_com_top.jsp"/>
+		<put-attribute name="bottom" value="/WEB-INF/views/stu/layout/bottom/stu_com_bottom.jsp"/>
+	</definition>
+	<definition name="stu/com/*" extends="stuTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/stu/com/{1}.jsp"/>
+	</definition>
+	<definition name="stu/com/*/*" extends="stuTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/stu/com/{1}/{2}.jsp"/>
+	</definition>
+<!-- 강사 템플릿 -->
+	<definition name="tchTemplate" template="/WEB-INF/views/tch/layout/mainTemplate.jsp">
+		<put-attribute name="top" value="/WEB-INF/views/tch/layout/top/tch_com_top.jsp"/>
+		<put-attribute name="bottom" value="/WEB-INF/views/tch/layout/bottom/tch_com_bottom.jsp"/>
+	</definition>
+	<definition name="tch/com/*" extends="tchTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/tch/com/{1}.jsp"/>
+	</definition>
+	<definition name="tch/com/*/*" extends="tchTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/tch/com/{1}/{2}.jsp"/>
+	</definition>
+<!-- 직원 템플릿 -->
+	<definition name="empTemplate" template="/WEB-INF/views/emp/layout/mainTemplate.jsp">
+		<put-attribute name="top" value="/WEB-INF/views/emp/layout/top/emp_com_top.jsp"/>
+		<put-attribute name="bottom" value="/WEB-INF/views/emp/layout/bottom/emp_com_bottom.jsp"/>
+	</definition>
+	<definition name="emp/com/*" extends="empTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/emp/com/{1}.jsp"/>
+	</definition>
+	<definition name="emp/com/*/*" extends="empTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/emp/com/{1}/{2}.jsp"/>
+	</definition>
+<!-- PMS 템플릿 -->
+	<definition name="pmsTemplate" template="/WEB-INF/views/pms/layout/mainTemplate.jsp">
+		<put-attribute name="top" value="/WEB-INF/views/pms/layout/top/pms_com_top.jsp"/>
+		<put-attribute name="bottom" value="/WEB-INF/views/pms/layout/bottom/pms_com_bottom.jsp"/>
+	</definition>
+	<definition name="pms/com/*" extends="pmsTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/pms/com/{1}.jsp"/>
+	</definition>
+	<definition name="pms/com/*/*" extends="pmsTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/pms/com/{1}/{2}.jsp"/>
+	</definition>
+<!-- 테스트 템플릿 -->
+	<definition name="testTemplate" template="/WEB-INF/views/test/layout/template.jsp">
+		<put-attribute name="top" value="/WEB-INF/views/test/layout/top/test_top.jsp"/>
+		<put-attribute name="bottom" value="/WEB-INF/views/test/layout/bottom/test_bottom.jsp"/>
+	</definition>
+
+	<definition name="test/*/*" extends="testTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/test/{2}.jsp"/>
+	</definition>
+</tiles-definitions>

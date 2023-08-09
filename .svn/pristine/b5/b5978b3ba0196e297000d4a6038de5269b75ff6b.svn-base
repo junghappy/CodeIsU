@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="team.tttt.pms.stu.notice.mapper.StuNoticeMapper">
+
+<sql id="boardSearch">
+</sql>
+
+
+	<select id="selectBoardCount" resultType="int" parameterType="PaginationInfoVO">
+		select
+			count(A.HNTC_NO)
+			, count(B.USER_NM)
+		FROM
+			TB_HNTC A
+			LEFT OUTER JOIN TB_EMP B ON B.EMP_NO = A.EMP_NO
+		where
+			1=1
+		<include refid="boardSearch"/>
+	</select>
+
+	<!-- 공지사항 전체 조회 -->
+	<select id="selectHntc" parameterType="PaginationInfoVO" resultType="hntcVO">
+	<!-- team.tttt.pms.emp.hntc.mapper.HntcMapper.selectHntc -->
+		SELECT
+		    ROWNUM AS RNUM
+		    , A.HNTC_NO AS HNTC_NO
+		    , A.USER_NM AS USER_NM
+		    , A.HNTC_NM AS HNTC_NM
+		    , A.HNTC_DT AS HNTC_DT
+		    , A.CHECK_NO AS CHECK_NO
+		FROM
+		(
+		    SELECT
+		        TB_HNTC.HNTC_NO AS HNTC_NO
+		        , TB_EMP.USER_NM AS USER_NM
+		        , TB_HNTC.HNTC_NM AS HNTC_NM
+		        , TO_CHAR(TB_HNTC.HNTC_DT, 'YYYY-MM-DD') AS HNTC_DT
+		        , TB_HNTC.HNTC_CN AS HNTC_CN
+		        , TB_HNTC.ATCH_FILE_NO AS ATCH_FILE_NO
+		        , TB_HNTC.CHECK_NO AS CHECK_NO
+		    FROM
+		        TB_HNTC
+		    JOIN TB_EMP ON TB_EMP.EMP_NO = TB_HNTC.EMP_NO
+		    where
+		    	1=1
+				<include refid="boardSearch"/>
+		    ORDER BY HNTC_DT
+		) A
+		<![CDATA[
+			where RNUM >= #{startRow} and RNUM <= #{endRow}
+		]]>
+	</select>
+
+	<select id="detailNotice" parameterType="String" resultType="hntcVO">
+		SELECT
+		    A.HNTC_NO
+		    , A.EMP_NO
+		    , A.HNTC_NM
+		    , to_char(A.HNTC_DT, 'yyyy-mm-dd') as HNTC_DT
+		    , A.HNTC_CN
+		    , A.ATCH_FILE_NO
+		    , A.CHECK_NO
+		    , B.USER_NM
+		FROM TB_HNTC A
+		JOIN TB_EMP B ON A.EMP_NO = B.EMP_NO
+		WHERE HNTC_NO =  #{boNo}
+	</select>
+
+	<!-- 공지사항 조회수 업데이트 -->
+	<update id="hntcCheckNoUp" parameterType="String">
+		UPDATE TB_HNTC A
+		SET
+			A.CHECK_NO = A.CHECK_NO+1
+		WHERE A.HNTC_NO = #{bono}
+	</update>
+
+</mapper>

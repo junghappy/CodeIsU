@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.webapp.mapper.ProjectTaskMapper">
+
+	<resultMap type="taskVO" id="taskMap">
+		<id 	property="taskNo" 		column="task_no" />
+		<result property="taskNo" 		column="task_no"/>
+		<result property="taskTitle" 	column="task_title"/>
+		<result property="taskPriority" column="task_priority"/>
+		<result property="taskBengDt" 	column="task_beng_dt"/>
+		<result property="taskDdlnDt" 	column="task_ddln_dt"/>
+		<result property="taskRegDt" 	column="task_reg_dt"/>
+		<result property="taskCn" 		column="task_cn"/>
+		<result property="projNo" 		column="proj_no"/>
+		<result property="taskStts" 	column="task_stts"/>
+		<result property="upperTask" 	column="upper_task"/>
+		<result property="taskSttr" 	column="task_sttr"/>
+		<collection property="asgList" 	resultMap="ASGMap"/>
+	</resultMap>
+
+	<resultMap type="asgVO" id="ASGMap">
+		<result property="taskNo" 		column="task_no"/>
+		<result property="stuNo" 		column="stu_no"/>
+		<result property="userNm" 		column="user_nm"/>
+	</resultMap>
+
+
+<!-- 상위 업무 생성 -->
+<insert id="insertUpperTask" parameterType="taskVO">
+/* team.tttt.webapp.mapper.ProjectTaskMapper.insertUpperTask */
+insert into tb_task(
+	task_no
+	, task_title
+	, task_priority
+	, task_beng_dt
+	, task_ddln_dt
+	, task_reg_dt
+	, task_cn
+	, proj_no
+	, task_stts
+	, task_sttr
+) values(
+	#{taskNo}
+	, #{taskTitle}
+	, #{taskPriority}
+	, #{taskBengDt}
+	, #{taskDdlnDt}
+	, sysdate
+	, #{taskCn}
+	, #{projNo}
+	, #{taskStts}
+	, #{taskSttr}
+)
+</insert>
+
+<!-- 하위 업무 생성 -->
+<insert id="insertLowerTask" parameterType="taskVO">
+/* team.tttt.webapp.mapper.ProjectTaskMapper.insertLowerTask */
+
+insert into tb_task(
+	task_no
+	, task_title
+	, task_priority
+	, task_beng_dt
+	, task_ddln_dt
+	, task_reg_dt
+	, task_cn
+	, proj_no
+	, task_stts
+	, task_sttr
+	, upper_task
+) values(
+	#{taskNo}
+	, #{taskTitle}
+	, #{taskPriority}
+	, #{taskBengDt}
+	, #{taskDdlnDt}
+	, sysdate
+	, #{taskCn}
+	, #{projNo}
+	, #{taskStts}
+	, #{taskSttr}
+	, #{upperTask}
+)
+</insert>
+
+<!-- 업무 목록 조회 -->
+<select id="taskList" parameterType="string" resultMap="taskMap">
+
+
+/* team.tttt.webapp.mapper.ProjectTaskMapper.TaskList */
+
+select
+	tb_task.task_no
+	, tb_task.task_title
+	, tb_task.task_priority
+	, TO_CHAR(TO_DATE(tb_task.task_beng_dt, 'YYYYMMDD'), 'YYYY-MM-DD') as task_beng_dt
+	, TO_CHAR(TO_DATE(tb_task.task_ddln_dt, 'YYYYMMDD'), 'YYYY-MM-DD') as task_ddln_dt
+	, to_char(tb_task.task_reg_dt, 'yyyy-mm-dd') as TASK_REG_DT
+	, tb_task.task_cn
+	, tb_task.proj_no
+	, tb_task.task_stts
+	, tb_task.upper_task
+	, tb_task.task_sttr
+    , tb_stu.user_nm
+    , tb_stu.stu_no
+from
+	tb_task
+	join tb_asg on tb_task.task_no = tb_asg.task_no
+	join tb_stu on tb_asg.stu_no = tb_stu.stu_no
+where
+	proj_no = #{projNo}
+</select>
+
+
+<!-- 업무 상세조회 -->
+<select id="taskDetail" parameterType="string" resultMap="taskMap">
+/* team.tttt.webapp.mapper.ProjectTaskMapper.taskDetail */
+
+	select
+		tb_task.task_no
+		, tb_task.task_title
+		, tb_task.task_priority
+		, tb_task.task_beng_dt
+		, tb_task.task_ddln_dt
+		, to_char(tb_task.task_reg_dt, 'yyyy-mm-dd') as TASK_REG_DT
+		, tb_task.task_cn
+		, tb_task.proj_no
+		, tb_task.task_stts
+		, tb_task.upper_task
+		, tb_task.task_sttr
+	    , tb_stu.user_nm
+	    , tb_stu.stu_no
+	from
+		tb_task
+		join tb_asg on tb_task.task_no = tb_asg.task_no
+		join tb_stu on tb_asg.stu_no = tb_stu.stu_no
+	where tb_task.task_no = #{taskNo}
+</select>
+
+
+<!-- 업무 삭제 -->
+<delete id="taskDelete" parameterType="string">
+/* team.tttt.webapp.mapper.ProjectTaskMapper.taskDelete */
+
+delete
+from
+	tb_task
+where
+	task_no = #{taskNo}
+</delete>
+
+
+<!-- 업무 업데이트 -->
+<update id="taskUpdate" parameterType="taskVO">
+/* team.tttt.webapp.mapper.ProjectTaskMapper.taskUpdate  */
+
+update
+	tb_task
+set
+	task_title = #{taskTitle}
+	, TASK_PRIORITY= #{taskPriority}
+	, TASK_BENG_DT =#{taskBengDt}
+	, TASK_DDLN_DT= #{taskDdlnDt}
+	, task_stts= #{taskStts}
+	, task_sttr= #{taskSttr}
+where task_no = #{taskNo} and proj_no = #{projNo}
+</update>
+
+
+</mapper>

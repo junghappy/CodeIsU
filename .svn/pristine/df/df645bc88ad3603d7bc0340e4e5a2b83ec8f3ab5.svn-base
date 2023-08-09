@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="team.tttt.webapp.mapper.UserMapper">
+
+	<resultMap type="userVO" id="userMap">
+		<id property="userNo" column="user_no"/>
+		<result property="userPswd" column="user_pswd"/>
+		<result property="userProfile" column="user_profile"/>
+		<result property="enabled" column="enabled"/>
+		<result property="userType" column="user_type"/>
+		<result property="userNm" column="user_nm"/>
+		<result property="userEmlAddr" column="user_eml_addr"/>
+		<result property="userPhoneno" column="user_phoneno"/>
+		<result property="userZip" column="user_zip"/>
+		<result property="userAddr" column="user_addr"/>
+		<result property="userDaddr" column="user_daddr"/>
+		<collection property="authList" resultMap="roleMap"/>
+	</resultMap>
+
+	<resultMap type="userRoleVO" id="roleMap">
+		<result property="userNo" column="user_no"/>
+		<result property="roleCd" column="role_cd"/>
+	</resultMap>
+
+	<insert id="create" parameterType="userVO" useGeneratedKeys="true">
+		<selectKey keyProperty="userNo" resultType="int" order="BEFORE">
+			select seq_member.nextval from dual
+		</selectKey>
+		insert into member(
+			user_no, user_id, user_pw, user_name, reg_date, upd_date
+		) values (
+			#{userNo}, #{userId}, #{userPw}, #{userName}, sysdate, sysdate
+		)
+	</insert>
+
+	<insert id="createAuth" parameterType="userRoleVO">
+		insert into member_auth(
+			user_no, auth
+		) values (
+			#{userNo}, #{auth}
+		)
+	</insert>
+
+	<select id="list" resultType="userVO">
+		select
+			user_no, user_id, user_pw, user_name, reg_date
+		from member
+		order by user_no desc
+	</select>
+	<select id="read" parameterType="string" resultMap="userMap">
+	/* team.tttt.webapp.mapper.UserMapper.read(String) */
+		SELECT
+			  M.USER_NO AS USER_NO
+			, M.USER_PSWD AS USER_PSWD
+			, M.ENABLED AS ENABLED
+			, M.USER_TYPE AS USER_TYPE
+			, A.ROLE_CD AS ROLE_CD
+			, S.USER_NM AS USER_NM
+			, S.USER_EML_ADDR AS USER_EML_ADDR
+			, S.USER_PHONENO AS USER_PHONENO
+			, S.USER_ZIP AS USER_ZIP
+			, S.USER_ADDR AS USER_ADDR
+			, S.USER_DADDR AS USER_DADDR
+			, S.USER_PROFILE AS USER_PROFILE
+
+			FROM TB_USER M
+			LEFT OUTER JOIN TB_ROLE_ASSIGN A ON (M.USER_NO = A.USER_NO)
+			<if test="userType.startsWith('S')">
+			LEFT OUTER JOIN TB_STU S ON (M.USER_NO = S.STU_NO)
+			</if>
+			<if test="userType.startsWith('E')">
+			LEFT OUTER JOIN TB_EMP S ON (M.USER_NO = S.EMP_NO)
+			</if>
+			<if test="userType.startsWith('T')">
+			LEFT OUTER JOIN TB_EMP S ON (M.USER_NO = S.EMP_NO)
+			</if>
+
+		WHERE M.USER_NO = #{userNo}
+
+
+	</select>
+
+	<update id="modify" parameterType="userVO">
+		update member
+		set
+			user_name = #{userName}
+		where user_no = #{userNo}
+	</update>
+
+	<delete id="deleteAuth" parameterType="int">
+		delete from member_auth
+		where user_no = #{userNo}
+	</delete>
+
+	<delete id="delete" parameterType="int">
+		delete from member
+		where user_no = #{userNo}
+	</delete>
+
+	<select id="readByUserNo" parameterType="string" resultMap="userMap">
+		select
+			m.mem_no, mem_id, mem_pw, mem_name, mem_gender, mem_email, mem_phone,
+			mem_postcode, mem_address1, mem_address2, mem_agree, mem_profileimg, mem_regdate, enabled,
+			a.auth
+		from dditmember m left outer join dditmember_auth a on(m.mem_no = a.mem_no)
+		where m.mem_id = #{memId}
+
+	</select>
+
+	<insert id="insertUser" parameterType="userVO">
+	insert all
+		into C_USER(user_no, user_pswd, user_type) values (#{userNo}, #{userPswd}, #{userType})
+		into STU(STU_NO, USER_NM, USER_EML_ADDR, USER_PHONENO, USER_ADDR, USER_DADDR, REG_DT, JOIN_DT, USER_PRVC_YN)
+		values (#{userNo} ,#{userNm} ,#{userEmlAddr} ,#{userPhoneno} ,#{userAddr} ,#{userDaddr} ,#{regDt} ,sysdate ,#{userPrvcYn})
+	select * from dual;
+	</insert>
+
+
+
+
+</mapper>

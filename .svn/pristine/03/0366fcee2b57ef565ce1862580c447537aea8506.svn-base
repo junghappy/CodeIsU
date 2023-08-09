@@ -1,0 +1,35 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib  uri="http://www.springframework.org/security/tags" prefix="sec"%>
+
+<h1>행정직원 시작 페이지</h1>
+
+<body>
+<button id="hntcBtn">공지사항 바로가기</button>
+<button id="dscsnBtn">취업상담 바로가기</button>
+<button id="svlfBtn">연수과정 바로가기</button>
+</body>
+
+
+
+<script type="text/javascript">
+$(function(){
+	var hntcBtn = $("#hntcBtn");
+	var dscsnBtn = $("#dscsnBtn");
+	var svlfBtn = $("#svlfBtn");
+
+	hntcBtn.on("click", function(){
+		location.href = "/emp/hntcBoard"
+	})
+
+	dscsnBtn.on("click", function(){
+		location.href = "/emp/dscsnBoard"
+	})
+
+	svlfBtn.on("click", function(){
+		location.href = "/emp/svlfList"
+	})
+})
+
+</script>

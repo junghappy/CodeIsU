@@ -1,0 +1,14 @@
+package team.tttt.pms.stu.classroom.service;
+
+import java.util.List;
+
+import team.tttt.pms.common.enums.ServiceResult;
+import team.tttt.pms.stu.vo.QstnVO;
+
+public interface StuQstnService {
+
+	public List<QstnVO> selectQstnList(QstnVO qstnVO);
+
+	public ServiceResult insertQstn(QstnVO qstnVO);
+
+}

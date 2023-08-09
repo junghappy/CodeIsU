@@ -1,0 +1,38 @@
+package team.tttt.pms.project.kanban.service.Impl;
+
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import team.tttt.pms.common.enums.ServiceResult;
+import team.tttt.pms.project.kanban.mapper.PmsKanbanMapper;
+import team.tttt.pms.project.kanban.service.PmsKanbanService;
+import team.tttt.pms.project.vo.TaskVO;
+
+@Service
+public class PmsKanbanServiceImpl implements PmsKanbanService {
+
+	@Inject
+	private PmsKanbanMapper mapper;
+
+	@Override
+	public ServiceResult moveBoard(Map<String, Object> moveBoard) {
+
+		TaskVO vo = (TaskVO) moveBoard.get("taskVO");
+
+		int cnt = mapper.moveBoard(vo);
+
+		ServiceResult result;
+
+		if(cnt > 0) {
+			result = ServiceResult.OK;
+		}else {
+			result = ServiceResult.FAILED;
+		}
+
+		return result;
+	}
+
+}

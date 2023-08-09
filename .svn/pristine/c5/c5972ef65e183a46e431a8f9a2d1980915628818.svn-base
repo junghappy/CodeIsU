@@ -1,0 +1,195 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%>
+<script src="${pageContext.request.contextPath}/common/sw/js/PmsProjectJs.js"></script>
+<script src="${pageContext.request.contextPath}/common/sw/js/CommonCode.js"></script>
+<style>
+  /* 헤더 텍스트 가운데 정렬 위함 */
+  .centered {
+    .ag-header-cell-label {
+      justify-content: center !important;
+    }
+  }
+  /* 그리드 헤더 색상 */
+  .ag-theme-alpine {
+    -ag-header-background-color: #484c7f;
+    -ag-header-foreground-color: #ffffff;
+  }
+
+  /* 그리드 내용 가운데 정렬 */
+  .ag-row .ag-cell {
+    display: flex;
+    justify-content: center;
+    /* align horizontal */
+    align-items: center;
+    /* align-content: center; */
+  }
+
+  .ag-header-cell-text {
+    margin-left: 40px;
+  }
+
+  .task {
+    background-color: #f4f2f2;
+  }
+  .taskCn {
+    background-color: #f4f2f2;
+  }
+
+  .msubBtn {
+    background-color: #56726a;
+    color: white;
+  }
+  .mcanBtn {
+    border: 1px solid gray;
+  }
+</style>
+
+<link
+  rel="stylesheet"
+  href="${pageContext.request.contextPath}/common/sw/css/PmsProjectCss.css"
+/>
+
+<div id="wrapper">
+  <div
+    id="myGrid"
+    style="height: 600px; width: 100%"
+    class="ag-theme-alpine"
+  ></div>
+</div>
+
+<!--모달-->
+<div
+  class="modal fade"
+  id="taskModal"
+  role="dialog"
+  aria-labelledby="taskModal"
+  aria-hidden="true"
+>
+  <div class="modal-dialog d-flex justify-content-center" role="document">
+    <div class="modal-content" id="taskModalBody"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+<script>
+  var projNo = "a001";
+
+  //서버에서 발행된 헤더네임과 토큰갑사 저장
+  var header = "${_csrf.headerName}";
+  var token = "${_csrf.token}";
+
+  //바닐라 자바스크립트 사용시 AJAX send 전에 헤더값 세팅 필요
+  //xhr.setRequestHeader(header, token);
+
+  const columnDefs = [
+    {
+      field: "taskNo",
+      headerName: "업무번호",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskTitle",
+      headerName: "업무명",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskStts",
+      headerName: "상태",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskPriority",
+      headerName: "우선순위",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskBengDt",
+      headerName: "시작일",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskDdlnDt",
+      headerName: "마감일",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskRegDt",
+      headerName: "등록일",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "taskSttr",
+      headerName: "전척도",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "upperTask",
+      headerName: "상위 업무번호",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+    {
+      field: "userNms",
+      headerName: "담당자",
+      cellStyle: { textAlign: "center" },
+      maxWidth: 200,
+    },
+  ];
+
+  const rowData = [];
+
+  function getData(projNo) {
+    $.ajax({
+      url: "/pms/project/taskListOut?${_csrf.parameterName}=${_csrf.token}",
+      data: {
+        projNo: projNo,
+      },
+      type: "POST",
+      dataType: "json",
+      success: function (res) {
+        console.log("넘어온 데이터", res);
+
+        const updatedRes = res.map((data) => {
+          const userNms = data.asgList.map((item) => item.userNm);
+          return { ...data, userNms };
+        });
+
+        gridOptions.api.setRowData(updatedRes);
+      },
+      error: function (xhr, status, error) {
+        console.error(error);
+      },
+    });
+  }
+
+  const gridOptions = {
+    columnDefs: columnDefs,
+    rowData: rowData,
+    rowSelection: "multiple",
+    animateRows: true,
+
+    onCellClicked: (params) => {
+      console.log("등록한 데이터 tr", params);
+
+      detailTask(params.data.taskNo);
+    },
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const gridDiv = document.querySelector("#myGrid");
+    new agGrid.Grid(gridDiv, gridOptions);
+    getData(projNo);
+  });
+
+  deliverToken(header, token);
+
+  const cdTypeId = "P003";
+</script>

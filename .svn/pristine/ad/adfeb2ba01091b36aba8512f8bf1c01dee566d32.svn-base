@@ -1,0 +1,64 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<style>
+	#headDiv{
+		border: 1px solid red;
+		display: flex;
+		justify-content: flex-start;
+	}
+
+	#contentDiv{
+		border: 1px solid red;
+		height: 300px;
+		margin-top: 20px;
+	}
+
+	#footDiv{
+		border: 1px solid red;
+		margin-top: 20px;
+		text-align: right;
+	}
+
+	.hDiv{
+		width: 30%;
+	}
+</style>
+
+<body>
+
+	<h1>상세보기 페이지</h1>
+	<div id="headDiv">
+		<div class="hDiv">${hntcVO.hntcNo }</div>
+		<div class="hDiv" style="text-align: center;">${hntcVO.hntcNm }</div>
+		<div class="hDiv" style="text-align: right;">${hntcVO.hntcDt }</div>
+	</div>
+	<div id="contentDiv">
+		${hntcVO.hntcCn }
+	</div>
+	<div id="footDiv">
+		<button id="modifyBtn" class="btn btn-primary">수정</button>
+		<button id="delBtn" class="btn btn-secondary">삭제</button>
+		<button id="listBtn" class="btn btn-secondary">목록</button>
+	</div>
+<script type="text/javascript">
+$(function(){
+	var modifyBtn = $("#modifyBtn");
+	var delBtn = $("#delBtn");
+	var listBtn = $("#listBtn");
+
+	modifyBtn.on("click", function(){
+		location.href = "/emp/hntc/hntcUpdateForm?bono=${hntcVO.hntcNo }"
+	});
+
+	delBtn.on("click", function(){
+		location.href = "/emp/hntc/hntcDel?bono=${hntcVO.hntcNo }";
+	});
+
+	listBtn.on("click", function(){
+		location.href = "/emp/hntc/hntcBoard";
+	});
+
+})
+
+</script>
+</body>

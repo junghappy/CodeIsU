@@ -1,0 +1,40 @@
+package team.tttt.pms.stu.mypage.web;
+
+import java.util.UUID;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import lombok.extern.slf4j.Slf4j;
+import team.tttt.pms.common.enums.ServiceResult;
+import team.tttt.pms.stu.mypage.service.QrCheckService;
+
+@Slf4j
+@Controller
+public class QrCheckController {
+
+	@Inject
+	QrCheckService service;
+
+	@RequestMapping(value = "/qrcheck/qrcode", method = RequestMethod.GET)
+	public String qrGenPage() {
+		return "/common/qrcheck/qrGenPage";
+	}
+
+	@RequestMapping(value = "/qrcheck/reloadqr", method = RequestMethod.POST)
+	public String reloadQrCode() {
+		String uuidToken = UUID.randomUUID().toString();
+
+		ServiceResult result = service.insertToken(uuidToken);
+
+		return null;
+	}
+
+	public String qrCheck() {
+		return "";
+	}
+
+}

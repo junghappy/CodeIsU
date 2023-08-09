@@ -1,0 +1,22 @@
+package team.tttt.webapp.mapper;
+
+import java.util.List;
+
+import team.tttt.webapp.vo.TaskVO;
+
+public interface ProjectTaskMapper {
+
+	int insertUpperTask(TaskVO taskVO);
+
+	int insertLowerTask(TaskVO taskVO);
+
+	List<TaskVO> taskList(String projNo);
+
+	TaskVO taskDetail(String taskNo);
+
+	int taskDelete(String taskNo);
+
+	int taskUpdate(TaskVO taskVO);
+
+
+}

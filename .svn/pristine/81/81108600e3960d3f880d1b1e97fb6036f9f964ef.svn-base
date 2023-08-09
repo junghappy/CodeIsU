@@ -1,0 +1,33 @@
+<table summary class="style2 recruit-list">
+  <colgroup>
+    <col width="" />
+    <col width="20%" />
+    <col width="20%" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>제목</th>
+      <th>등록자</th>
+      <th>등록일</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding-top: 24px; vertical-align: top">
+        \${dataList[i].strTitle}
+      </td>
+      <td class="sbj" style="line-height: 200%">
+        <span class="ico t4"></span> \${dataList[i].userNm}
+      </td>
+      <td>
+        \${dataList[i].userNm} <br />
+        <span class="tag addr" style="line-height: 29px">뭐 넣을지 생각 </span>
+      </td>
+      <td style="line-height: 200% !important">
+        <span class="">\${dataList[i].strRegDt}</span>
+        <br />
+        <input type="hidden" class="strNo" value="\${dataList[i].strNo}" />
+      </td>
+    </tr>
+  </tbody>
+</table>

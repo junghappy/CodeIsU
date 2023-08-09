@@ -1,0 +1,173 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<style>
+.ImgStuNoQstnDtBox {
+    margin-bottom: 20px;
+    height: 40px;
+}
+.ImgStuNoQstnDtBox .stuNoQstnDt{
+    top: 1px;
+    left: 50px;
+
+}
+.ImgStuNoQstnDtBox .stuNoQstnDt .stuNo{
+    font-size: 14px;
+    font-weight: 600px;
+}
+.ImgStuNoQstnDtBox .stuNoQstnDt .qstnDt{
+    font-size: 12px;
+}
+
+.dropdown{
+	top : 0px;
+	right: 0px;
+}
+.style-none{
+	border: none;
+	background-color: white;
+	color:none;
+	color: white;
+}
+
+/* .my-transform{
+	transform: translate3d(-142px, 29.6667px, 0px);
+
+} */
+
+</style>
+<div class="container">
+<div class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Modal body text goes here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="accordion mb-2" id="accordionExample">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <img alt="" src="">
+                <span>질문을 입력하세요</span>
+            </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+			    <form action="/stu/classroom/qstn?${_csrf.parameterName }=${_csrf.token}" method="post" id="qstnForm">
+			    	<input type="hidden" id="editorInput" name="editorInput">
+			        <div id="editor"></div>
+			        <div class="text-end">
+				        <button type="button" class="btn btn-secondary" id="btn" >등록</button>
+			        </div>
+			    </form>
+            </div>
+        </div>
+    </div>
+	<div class="com">
+        <c:choose>
+            <c:when test="${empty qstnList}">
+                <div>
+                    <p>조회하실 게시물이 존재하지 않습니다.</p>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <c:forEach items="${qstnList }" var="qstn">
+                    <div class="card">
+	                    <div class="card-body border">
+	                        <div class="ImgStuNoQstnDtBox position-relative">
+		                        <img alt="" src="" width="40px" height="40px">
+		                        <ul class="stuNoQstnDt position-absolute">
+			                        <li class="stuNo">${qstn.stuNo}</span>
+			                        <li class="qstnDt">${qstn.qstnDt}</span>
+		                        </ul>
+		                        <div class="dropdown position-absolute style-none">
+								    <button class="dropdown-toggle style-none" type="button" id="s" data-bs-toggle="dropdown" aria-expanded="false">
+			                            <img alt="" src="${pageContext.request.contextPath}/resources/img/classroom/more.png">
+								    </button>
+								    <ul class="dropdown-menu my-transform" aria-labelledby="dropdownMenuButton1">
+								        <li><a class="dropdown-item" href="#" id="updateBtn">수정</a></li>
+								        <li><a class="dropdown-item" href="#" id="deleteBtn">삭제</a></li>
+								  </ul>
+								</div>
+	                        </div>
+	                        <div>${qstn.qstnCn }</div>
+	                        <div class="card mb-0">
+		                        <div class="card-body p-2 rounded border border-dark">
+		                            <c:if test="${empty qstn.qstnAns }">
+										댓글이 존재하지 않습니다.
+		                            </c:if>
+		                            <c:if test="${not empty qstn.qstnAns }">
+			                            ${qstn.qstnAns}
+		                            </c:if>
+		                        </div>
+
+							</div>
+	                    </div>
+                    </div>
+                </c:forEach>
+            </c:otherwise>
+        </c:choose>
+	</div>
+</div>
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.css"/>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+// 에디터 생성
+const Editor = toastui.Editor;
+const editor = new Editor({
+        el: document.querySelector('#editor'),
+        toolbarItems: [ // 사용할 기능 커스텀 - 파일업로드 삭제
+        	['heading', 'bold', 'italic', 'strike'],
+            ['hr', 'quote'],
+            ['ul', 'ol', 'task', 'indent', 'outdent'],
+            ['table', 'code', 'codeblock']
+        ],
+        height: '300px',
+        initialEditType: 'wysiwyg',
+        previewStyle: 'vertical'
+    });
+
+var btn = document.querySelector("#btn");
+
+btn.addEventListener("click", function () {
+    let editorData = editor.getHTML();
+    var csrfParameterName = '${_csrf.parameterName}';
+    var csrfToken = '${_csrf.token}';
+    $.ajax({
+	    url: '/stu/classroom/qstn?' + csrfParameterName + '=' + csrfToken,
+	    method: 'post',
+	    data: {
+	      "editorData":editorData
+	    },
+	    dataType: 'json',
+	    success: function(response) {
+	        console.log(response);
+	        var collapseOne = document.querySelector('#collapseOne');
+	        collapseOne.classList.remove('show');
+	        collapseOne.setAttribute('aria-expanded', 'false');
+	    },
+	    error: function(xhr, status, error) {
+	      // 요청이 실패했을 때 처리할 코드 작성
+	      console.error('Request failed. Status:', status);
+	    }
+	});
+})
+
+var updateBtn = document.querySelector("#updateBtn");
+var deleteBtn = document.querySelector("#updateBtn");
+
+updateBtn.addEventListener("click", function () {
+
+})
+</script>

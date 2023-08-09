@@ -1,0 +1,503 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib  uri="http://www.springframework.org/security/tags" prefix="sec"%>
+<style>
+.feather-icon{
+	height: 80px;
+	width: 80px;
+}
+
+.btnGroup{
+	background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.inLabel{
+	font-weight: bold;
+	color: black;
+}
+
+thead{
+	text-align: center;
+}
+
+th{
+	color: red;
+	font-weight: bold;
+}
+
+.table tbody{
+	text-align: center;
+	color: black;
+}
+
+.table-bordered td:first-child,
+.table-bordered th:first-child{
+	border-left: none;
+}
+
+.table-bordered td:last-child,
+.table-bordered th:last-child {
+    border-right: none;
+}
+
+.table thead th,
+.table tbody td{
+    border-bottom: 1.5px solid black;
+}
+
+</style>
+
+<div class="row justify-content-between">
+	<div class="card" style="height: 300px; width: 530px; margin-bottom: 10px;">
+		<div class="card-body" style="padding: 0;">
+			<h1 id="currentDate"></h1>
+			<h1 id="clock"></h1>
+		</div>
+	</div>
+
+	<div class="card" style="height: 300px; width: 600px; margin-bottom: 10px;">
+		<div class="card-body" style="padding: 0;">
+			<div class="row">
+				<div class="col-12" style="height: 30px;">
+					<p style="font-weight: bold;">바로가기</p>
+				</div>
+			</div>
+			<div class="row align-items-center" style="height: 135px;">
+				<div class="col-3 text-center">
+					<!-- 공지사항 -->
+					<button class="btnGroup" id="hntcBtn"><i data-feather="clipboard" class="feather-icon"></i></button>
+					<br><label class="inLabel">공지사항</label>
+				</div>
+				<div class="col-3 text-center">
+					<!-- 상담 -->
+					<button class="btnGroup" id="dscsnBtn"><i data-feather="message-circle" class="feather-icon"></i></button>
+					<br><label class="inLabel">상담</label>
+				</div>
+				<div class="col-3 text-center">
+					<!-- 연수과정 -->
+					<button class="btnGroup" id="svlfBtn"><i data-feather="edit-2" class="feather-icon"></i></button>
+					<br><label class="inLabel">연수과정</label>
+				</div>
+				<div class="col-3 text-center">
+					<!-- 수업목록 -->
+					<button class="btnGroup" id="sbjctBtn"><i data-feather="book-open" class="feather-icon"></i></button>
+					<br><label class="inLabel">수업목록</label>
+				</div>
+			</div>
+
+			<div class="row align-items-center" style="height: 135px;">
+				<div class="col-3 text-center">
+					<!-- 공통코드 -->
+					<button class="btnGroup" id="cmCodeBtn"><i data-feather="hash" class="feather-icon"></i></button>
+					<br><label class="inLabel">공통코드</label>
+				</div>
+				<div class="col-3 text-center">
+					<!-- 시간표 -->
+					<button class="btnGroup" id="scheduleBtn"><i data-feather="calendar" class="feather-icon"></i></button>
+					<br><label class="inLabel">시간표</label>
+				</div>
+				<div class="col-3 text-center">
+					<!-- 학생출결 -->
+					<button class="btnGroup" id="attdBtn"><i data-feather="user-check" class="feather-icon"></i></button>
+					<br><label class="inLabel">학생출결</label>
+				</div>
+				<div class="col-3 text-center">
+					<!-- 조퇴/외출 -->
+					<button class="btnGroup" id="kalleaveBtn"><i data-feather="user-x" class="feather-icon"></i></button>
+					<br><label class="inLabel">조퇴/외출</label>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<div class="row">
+	<div class="card" style="height: 450px; margin-bottom: 10px;">
+		<div class="card-body" style="padding: 0;">
+
+			<ul class="nav nav-tabs mb-3" role="tablist">
+				<li class="nav-item" role="presentation">
+					<a href="#home" data-bs-toggle="tab" aria-expanded=true class="nav-link active">
+						<i class="mdi mdi-home-variant d-lg-none d-block me-1"></i>
+						<span class="d-none d-lg-block">공지 사항</span>
+					</a>
+				</li>
+				<li class="nav-item" role="presentation">
+					<a href="#profile" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+						<i class="mdi mdi-account-circle d-lg-none d-block me-1"></i>
+						<span class="d-none d-lg-block">연수 과정</span>
+					</a>
+				</li>
+				<li class="nav-item" role="presentation">
+					<a href="#dscsn" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+						<i class="mdi mdi-account-circle d-lg-none d-block me-1"></i>
+						<span class="d-none d-lg-block">오늘 상담</span>
+					</a>
+				</li>
+			</ul>
+
+			<div class="tab-content">
+				<div class="tab-pane show active" id="home" role="tabpanel">
+					<table class="table table-bordered border-dark">
+						<thead class="table" style="font-weight: bold;">
+							<tr>
+								<th class="p-1" colspan="5" style="text-align: center;">공지사항</th>
+							</tr>
+							<tr>
+								<th class="p-1">글번호</th>
+								<th class="p-1">제목</th>
+								<th class="p-1">작성지</th>
+								<th class="p-1">작성일</th>
+								<th class="p-1">조회수</th>
+							</tr>
+						</thead>
+						<tbody class="table" id="hntcBody">
+						</tbody>
+					</table>
+				</div>
+
+				<div class="tab-pane" id="profile" role="tabpanel">
+					<table class="table table-bordered border-dark">
+						<thead class="table">
+							<tr>
+								<th class="p-1" colspan="6" style="text-align: center;">연수과정 목록</th>
+							</tr>
+							<tr>
+								<th class="p-1">번호</th>
+								<th class="p-1">과정명</th>
+								<th class="p-1">시작일</th>
+								<th class="p-1">수료일</th>
+								<th class="p-1">강의실</th>
+								<th class="p-1">담임</th>
+							</tr>
+						</thead>
+						<tbody class="table" id="svlfBody">
+						</tbody>
+					</table>
+				</div>
+
+				<div class="tab-pane" id="dscsn" role="tabpanel">
+					 <table class="table table-bordered border-dark">
+						<thead class="table">
+							<tr>
+								<th class="p-1" colspan="5" style="text-align: center;">오늘의 상담</th>
+							</tr>
+							<tr>
+								<th class="p-1">분류</th>
+								<th class="p-1">날짜</th>
+								<th class="p-1">상담원</th>
+								<th class="p-1">상담자</th>
+								<th class="p-1">호실</th>
+							</tr>
+						</thead>
+						<tbody class="table" id="dscsnBody">
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<script>
+feather.replace();
+
+$(function(){
+	function updateDate() {
+		const now = new Date();
+		const year = now.getFullYear();
+		const month = (now.getMonth() + 1).toString().padStart(2, '0');
+		const day = now.getDate().toString().padStart(2, '0');
+
+		// 날짜를 표시하는 div 요소에 현재 날짜를 설정
+		$("#currentDate").text(year + "년" + month + "월" + day + "일");
+	}
+	setInterval(updateDate, 1000);
+	updateDate();
+
+	startTime();
+	mainhntc();
+	mainDscsn();
+	mainkalleave();
+	mainsvlf();
+
+	var hntcBtn = $("#hntcBtn");
+	var dscsnBtn = $("#dscsnBtn");
+	var svlfBtn = $("#svlfBtn");
+	var sbjctBtn = $("#sbjctBtn");
+	var cmCodeBtn = $("#cmCodeBtn");
+	var scheduleBtn = $("#scheduleBtn");
+	var attdBtn = $("#attdBtn");
+	var kalleaveBtn = $("#kalleaveBtn");
+
+	hntcBtn.on("click", function(){
+		location.href = "/emp/hntc/hntcBoard"
+	})
+
+	dscsnBtn.on("click", function(){
+		location.href = "/emp/dscsn/dscsnBoard"
+	})
+
+	svlfBtn.on("click", function(){
+		location.href = "/emp/svlf/svlfList"
+	})
+
+	sbjctBtn.on("click", function(){
+		location.href = "/emp/sbjct/sbjctList"
+	})
+
+	cmCodeBtn.on("click", function(){
+		location.href = "/emp/cmcode"
+	})
+
+	scheduleBtn.on("click", function(){
+		location.href = "/emp/class/schedule"
+	})
+
+	attdBtn.on("click", function(){
+		location.href = "/emp/stuman/attend"
+	})
+
+	kalleaveBtn.on("click", function(){
+		location.href = "/emp/stuman/kalleave"
+	})
+})
+
+function startTime() {
+    var today = new Date();
+    var h = today.getHours();
+    var m = today.getMinutes();
+    var s = today.getSeconds();
+    h = checkTime(h);
+    m = checkTime(m);
+    s = checkTime(s);
+    document.getElementById('clock').innerHTML =
+    h + ":" + m + ":" + s;
+    var t = setTimeout(startTime, 500);
+}
+function checkTime(i) {
+    if (i < 10) {i = "0" + i}; // 숫자가 10보다 작을 경우 앞에 0을 붙여줌
+    return i;
+}
+
+function mainhntc(){
+	$.ajax({
+		url : "/emp/hntc/hntcList",
+		type : "get",
+		dataType : "json",
+		success : function(res){
+			var str = "";
+
+			if(res.length > 5){
+				for(let i=0; i<5; i++){
+					str += `
+						<tr>
+							<td class="p-1">\${res[i].hntcNo}</td>
+							<td style="text-align: left;" class="p-1">\${res[i].hntcNm}</td>
+							<td class="p-1">\${res[i].empNo}</td>
+							<td class="p-1">\${res[i].hntcDt}</td>
+							<td class="p-1">\${res[i].hntcCn}</td>
+						</tr>`
+					}
+			}else{
+				for(let i=0; i<res.length; i++){
+					str += `
+						<tr>
+							<td class="p-1">\${res[i].hntcNo}</td>
+							<td style="text-align: left;" class="p-1">\${res[i].hntcNm}</td>
+							<td class="p-1">\${res[i].empNo}</td>
+							<td class="p-1">\${res[i].hntcDt}</td>
+							<td class="p-1">\${res[i].hntcCn}</td>
+						</tr>`
+					}
+			}
+
+			$("#hntcBody").html(str);
+		},
+		error : function(xhr){
+			alert("상태 : " + xhr.status);
+		}
+	})
+}
+
+function mainDscsn(){
+	$.ajax({
+		url : "/emp/dscsn/dscsnApprovList",
+		type : "get",
+		dataType : "json",
+		success : function(res){
+			var str = "";
+
+			if(res.length > 5){
+				for(let i=0; i<5; i++){
+					str += `
+						<tr>
+							<td class="p-1">\${res[i].dscsnCd}</td>
+							<td class="p-1">\${res[i].dscsnDt}</td>
+							<td class="p-1">\${res[i].empNo}</td>
+							<td class="p-1">\${res[i].stuNo}</td>
+							<td class="p-1">\${res[i].consulNm}</td>
+						</tr>`
+					}
+			}else{
+				for(let i=0; i<res.length; i++){
+					str += `
+						<tr>
+							<td class="p-1">\${res[i].dscsnCd}</td>
+							<td class="p-1">\${res[i].dscsnDt}</td>
+							<td class="p-1">\${res[i].empNo}</td>
+							<td class="p-1">\${res[i].stuNo}</td>
+							<td class="p-1">\${res[i].consulNm}</td>
+						</tr>`
+					}
+			}
+
+			$("#dscsnBody").html(str);
+		},
+		error : function(xhr){
+			alert("상태 : " + xhr.status);
+		}
+	})
+}
+
+function mainkalleave(){
+	$.ajax({
+		url : "/emp/stuman/attdanAllList",
+		type : "get",
+		dataType : "json",
+		success : function(res){
+			var str = "";
+
+			if(res.length > 5){
+				for(let i=res.length-1; i>res.length-6; i--){
+					str += `
+						<tr>
+							<td class="p-1">\${res[i].cdNm}</td>
+							<td class="p-1">\${res[i].attdanWriteDt}</td>
+							<td class="p-1">\${res[i].attdanDt}</td>
+							<td class="p-1">\${res[i].userNm}</td>
+						</tr>`
+					}
+			}else{
+				for(let i=res.length-1; i>=0; i--){
+					str += `
+						<tr>
+							<td class="p-1">\${res[i].cdNm}</td>
+							<td class="p-1">\${res[i].attdanWriteDt}</td>
+							<td class="p-1">\${res[i].attdanDt}</td>
+							<td class="p-1">\${res[i].userNm}</td>
+						</tr>`
+				}
+			}
+
+			$("#attdBody").html(str);
+		},
+		error : function(xhr){
+			alert("상태 : " + xhr.status);
+		}
+	})
+}
+
+function mainsvlf(){
+	$.ajax({
+		url : "/emp/svlf/svlfmainlist",
+		type : "get",
+		dataType : "json",
+		success : function(res){
+			console.log(res);
+			var str = "";
+
+			if(res.length > 4){
+				for(let i=res.length-1; i>res.length-6; i--){
+					str += `
+						<tr>
+							<td class="p-1">\${res[i].svlfNo}</td>
+							<td style="text-align: left;" class="p-1">\${res[i].svlfNm}</td>
+							<td class="p-1">\${res[i].svlfBgngDt}</td>
+							<td class="p-1">\${res[i].svlfDdlbDt}</td>
+							<td class="p-1">\${res[i].lectureRoomNm}</td>
+							<td class="p-1">\${res[i].userNm}</td>
+						</tr>`
+					}
+			}else{
+				for(let i=res.length-1; i>=0; i--){
+					str += `
+						<tr>
+							<td class="p-1">\${res[i].svlfNo}</td>
+							<td style="text-align: left;" class="p-1">\${res[i].svlfNm}</td>
+							<td class="p-1">\${res[i].svlfBgngDt}</td>
+							<td class="p-1">\${res[i].svlfDdlbDt}</td>
+							<td class="p-1">\${res[i].lectureRoomNm}</td>
+							<td class="p-1">\${res[i].userNm}</td>
+						</tr>`
+					}
+			}
+
+			$("#svlfBody").html(str);
+
+		},
+		error : function(xhr){
+			alert("상태 : " + xhr.status);
+		}
+	})
+}
+</script>
+
+
+<br><br><br>
+<div class="container">
+    <div class="row">
+				<div class="col-3">
+						<div class="list-group">
+								<a href="javascript:goToMenu('emp_notice')" class="list-group-item list-group-item-action active" aria-current="true">
+									공지사항
+								</a>
+						</div>
+				</div>
+        <div class="col-3">
+            <div class="list-group">
+                <a href="javascript:goToMenu('#')" class="list-group-item list-group-item-action active" aria-current="true">
+                  원생관리
+                </a>
+                <a href="javascript:goToMenu('emp_svlf')" class="list-group-item list-group-item-action">연수과정</a>
+                <a href="javascript:goToMenu('emp_stulist')" class="list-group-item list-group-item-action">학원생 등록</a>
+                <a href="javascript:goToMenu('emp_attend')" class="list-group-item list-group-item-action">출결 관리</a>
+                <a href="javascript:goToMenu('emp_kalleave')" class="list-group-item list-group-item-action">조퇴/외출</a>
+                <a href="javascript:goToMenu('emp_dscsnboard')" class="list-group-item list-group-item-action">상담관리</a>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="list-group">
+                <a href="javascript:goToMenu('#')" class="list-group-item list-group-item-action active" aria-current="true">
+                  수업관리
+                </a>
+                <a href="javascript:goToMenu('emp_sbjctList')" class="list-group-item list-group-item-action">수업관리</a>
+                <a href="javascript:goToMenu('emp_schedule')" class="list-group-item list-group-item-action">시간표</a>
+            </div>
+        </div>
+				<div class="col-3">
+					<div class="list-group">
+							<a href="javascript:goToMenu('emp_cmcode')" class="list-group-item list-group-item-action active" aria-current="true">
+								공통코드관리
+							</a>
+					</div>
+				</div>
+				<div class="col-3">
+					<div class="list-group">
+							<a href="javascript:goToMenu('emp_tchmanage')" class="list-group-item list-group-item-action active" aria-current="true">
+								강사관리
+							</a>
+					</div>
+				</div>
+
+
+    </div>
+</div>
+

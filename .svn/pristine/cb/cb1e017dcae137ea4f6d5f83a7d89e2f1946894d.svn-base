@@ -1,0 +1,11 @@
+package team.tttt.pms.stu.mypage.mapper;
+
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface QrCheckMapper {
+
+	int insertToken(String uuidToken);
+
+
+}

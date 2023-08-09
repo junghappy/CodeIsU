@@ -1,0 +1,27 @@
+package team.tttt.pms.emp.dscsn.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import team.tttt.pms.emp.vo.ConsulReservationVO;
+import team.tttt.pms.emp.vo.ConsultingRoomVO;
+import team.tttt.pms.emp.vo.DscsnVO;
+import team.tttt.pms.emp.vo.RejectVO;
+
+@Mapper
+public interface DscsnMapper {
+
+	public List<DscsnVO> dscsnNoList();
+	public List<DscsnVO> dscsnApprovList();
+	public List<DscsnVO> dscsnUnApprovList();
+	public List<ConsultingRoomVO> consulList(ConsulReservationVO consulReservationVO);
+	public int insertReservation(ConsulReservationVO consulReservationVO);
+	public void approvalUpdate(DscsnVO dscsnVO);
+	public int insertReject(RejectVO rejectVO);
+	public void unApprovalUpdate(int dscsnNo);
+	public List<DscsnVO> myDscsnList(String stuName);
+	public int resultInsert(DscsnVO dscsnVO);
+	public String selectResult(int no);
+	public List<DscsnVO> allapprolist();
+}
